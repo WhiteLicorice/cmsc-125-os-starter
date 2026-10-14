@@ -5,5 +5,20 @@
 # hash does not depend on the platform.
 * text=auto eol=lf
 
-# The vendored OpenSBI firmware is a binary. Git must not normalize it.
+# The vendored OpenSBI firmware is a binary. Git must not normalize it. It is
+# the only non-text file in the tree.
 firmware/*.bin binary
+
+# GitHub reports the repository's language from the byte count of each source
+# language. The test tooling below is not C, so hide it from that count and
+# leave the C kernel, the C cases, and the C self-test fixtures detectable.
+#
+# The three shell test scripts.
+*.sh linguist-detectable=false
+# The two compiler wrappers carry a shell shebang but no extension.
+/tests/selftest/no-deps-clang linguist-detectable=false
+/tests/selftest/empty-deps-clang linguist-detectable=false
+# The transcript parser.
+*.awk linguist-detectable=false
+# The console client and the persistence-reset helper.
+*.py linguist-detectable=false
