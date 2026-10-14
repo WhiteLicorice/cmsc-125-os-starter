@@ -1,0 +1,20 @@
+# Test case manifest. Tab-separated.
+#
+# name	stage	source	assertions	boots	fault	input
+#
+# name:        the case name, which is also the ktest kernel name
+# stage:       the laboratory stage that supplies the mechanisms
+# source:      the case source file, relative to the tree root
+# assertions:  the number of assertions the case must print per boot
+# boots:       the number of QEMU boots that share one disk image copy
+# fault:       a PANIC pattern for a negative case, or "-" for a positive case
+# input:       a console input fixture, relative to the tree root, or "-"
+#
+# make test STAGE=N runs every case whose stage is at most N.
+stage1_process	1	tests/cases/stage1_process.c	8	1	-	-
+stage1_switch	1	tests/cases/stage1_switch.c	8	1	-	-
+stage1_regs	1	tests/cases/stage1_regs.c	26	1	-	-
+stage1_stack	1	tests/cases/stage1_stack.c	5	1	-	-
+stage2_alloc	2	tests/cases/stage2_alloc.c	8	1	-	-
+stage3_syscall	3	tests/cases/stage3_syscall.c	8	1	-	-
+stage4_fs	4	tests/cases/stage4_fs.c	6	1	-	-
