@@ -21,7 +21,8 @@
 # "clang -Qunused-arguments". The command is word-split and globbing is off.
 # Quote characters inside CC are not interpreted.
 #
-# The starter and the reference OS share this file byte for byte.
+# The starter and the reference OS share this file byte for byte. The reference
+# OS is instructor material, and a student does not have it.
 
 set -eu
 

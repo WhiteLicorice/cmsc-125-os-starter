@@ -5,7 +5,7 @@
  * The controller supplies no input, because the fixture does not exist. The
  * case waits for a byte that never comes, so the boot ends at the deadline
  * with no completion record. It needs the stage 3 syscall mechanism, so only
- * the reference OS runs it.
+ * the reference OS (instructor only) runs it.
  */
 #include "assert.h"
 #include "kernel.h"

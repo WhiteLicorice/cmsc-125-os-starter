@@ -7,8 +7,9 @@
  * reads its own values. A switch_context that fails to save or restore one of
  * the registers hands a process the other process's value.
  *
- * The reference OS runs this case. The starter has no process mechanism, so
- * the build fails on the starter. That failure is the expected start state.
+ * The reference OS (instructor only) runs this case. The starter has no process
+ * mechanism, so the build fails on the starter. That failure is the expected
+ * start state.
  */
 #include "assert.h"
 #include "kernel.h"

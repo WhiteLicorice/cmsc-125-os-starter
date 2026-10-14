@@ -3,8 +3,9 @@
  * Stage 1 seed case: cooperative processes.
  *
  * The case calls the production mechanisms of stage 1 and reports the result
- * through the record grammar. On the reference OS it passes. On the starter
- * the mechanisms are absent, so the build fails. T04 writes the full suite.
+ * through the record grammar. On the reference OS (instructor only) it passes.
+ * On the starter the mechanisms are absent, so the build fails. The full suite
+ * is added later.
  */
 #include "assert.h"
 #include "kernel.h"

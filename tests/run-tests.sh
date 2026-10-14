@@ -6,9 +6,10 @@
 # It builds one test kernel per boot, boots it under QEMU, reads the
 # machine-readable records from the serial log, and prints a verdict. The
 # record grammar, the idle contract, and the diagnostic locations are
-# documented in README.md.
+# documented in ABOUT.md.
 #
-# The starter and the reference OS share this file byte for byte.
+# The starter and the reference OS share this file byte for byte. The reference
+# OS is instructor material, and a student does not have it.
 #
 # Usage:
 #   tests/run-tests.sh --stage N [--no-build]
@@ -328,9 +329,10 @@ done
 
 mkdir -p "$logs"
 
-# The reference OS reads the disk at boot, so the pristine test image must
-# exist before the first boot. The starter has no file system. The presence of
-# shell.c selects the reference, exactly as it does in the Makefile.
+# The reference OS (instructor only) reads the disk at boot, so the pristine
+# test image must exist before the first boot. The starter has no file system.
+# The presence of shell.c selects the reference, exactly as it does in the
+# Makefile.
 if [ -f "$root/shell.c" ]; then
     if ! make -C "$root" -s --no-print-directory build/test-disk.tar >/dev/null 2>&1; then
         echo "error: cannot build the test disk image in $root" >&2

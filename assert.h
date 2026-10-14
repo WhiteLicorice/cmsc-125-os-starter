@@ -1,9 +1,10 @@
 /* SPDX-License-Identifier: MIT
  *
  * The assertion header. A test case includes this file and calls
- * KTEST_ASSERT. The record grammar is documented in README.md.
+ * KTEST_ASSERT. The record grammar is documented in ABOUT.md.
  *
- * The starter and the reference OS share this file byte for byte.
+ * The starter and the reference OS share this file byte for byte. The reference
+ * OS is instructor material, and a student does not have it.
  */
 #pragma once
 

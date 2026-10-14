@@ -2,7 +2,7 @@
  *
  * Stage 4 seed case: disk and files.
  *
- * T08 writes the full suite. This seed checks the file table that fs_init
+ * The full suite is added later. This seed checks the file table that fs_init
  * loads from the disk image, and one round trip through the block device.
  * The controller gives the case a fresh copy of the pristine image.
  */

@@ -8,7 +8,8 @@
 # input fixture once the guest prints the case begin record. A missing or empty
 # fixture sends nothing, so the case meets the deadline.
 #
-# The starter and the reference OS share this file byte for byte.
+# The starter and the reference OS share this file byte for byte. The reference
+# OS is instructor material, and a student does not have it.
 #
 # Usage: tests/serial-client.py --socket PATH --log PATH [--input PATH]
 

@@ -8,7 +8,8 @@
  * so the fixture cannot pass by repeating the first boot. Both boots print two
  * assertions.
  *
- * The starter and the reference OS share this file byte for byte.
+ * The starter and the reference OS share this file byte for byte. The reference
+ * OS is instructor material, and a student does not have it.
  */
 #include "assert.h"
 #include "kernel.h"

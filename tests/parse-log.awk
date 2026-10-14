@@ -7,7 +7,8 @@
 # "ok", or a failure reason. A record is accepted only at the start of a
 # line. Any malformed, duplicate, or out-of-order record fails the case.
 #
-# The starter and the reference OS share this file byte for byte.
+# The starter and the reference OS share this file byte for byte. The reference
+# OS is instructor material, and a student does not have it.
 #
 # Reasons: hang, stale-build, malformed-record, duplicate-record,
 #          out-of-order-record, wrong-case, wrong-assertion-count,

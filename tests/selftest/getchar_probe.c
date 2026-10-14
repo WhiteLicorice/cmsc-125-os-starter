@@ -4,7 +4,7 @@
  *
  * The controller sends the fixture tests/selftest/getchar_probe.input. The
  * case reads one byte through SYS_GETCHAR and checks it. It needs the stage 3
- * syscall mechanism, so only the reference OS runs it.
+ * syscall mechanism, so only the reference OS (instructor only) runs it.
  */
 #include "assert.h"
 #include "kernel.h"

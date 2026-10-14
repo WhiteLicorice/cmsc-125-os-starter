@@ -5,7 +5,8 @@
  * The case prints an idle panic, then the assertion and the completion record.
  * A panic ends the transcript, so the records after it are out of order. The
  * controller must reject the transcript and report "out-of-order-record". The
- * case does not return, so the reference OS cannot add its own idle panic.
+ * case does not return, so the reference OS (instructor only) cannot add its
+ * own idle panic.
  */
 #include "assert.h"
 #include "kernel.h"

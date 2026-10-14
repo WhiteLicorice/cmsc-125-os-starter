@@ -7,7 +7,8 @@
 # verdict. The persistence and negative-fault self-tests need the file system
 # and the allocator, so the starter skips them. The starter has no shell.c.
 #
-# The starter and the reference OS share this file byte for byte.
+# The starter and the reference OS share this file byte for byte. The reference
+# OS is instructor material, and a student does not have it.
 #
 # Run with: make test-harness
 
