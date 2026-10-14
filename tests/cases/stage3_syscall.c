@@ -2,7 +2,7 @@
  *
  * Stage 3 seed case: applications and system calls.
  *
- * T07 writes the full suite. This seed checks the trap-frame ABI, the system
+ * The full suite is added later. This seed checks the trap-frame ABI, the system
  * call dispatch, and the user-mode mapping that create_process builds.
  */
 #include "assert.h"

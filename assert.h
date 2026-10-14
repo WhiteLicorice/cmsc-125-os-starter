@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT
  *
  * The assertion header. A test case includes this file and calls
- * KTEST_ASSERT. The record grammar is documented in README.md.
+ * KTEST_ASSERT. The record grammar is documented in ABOUT.md.
  */
 #pragma once
 

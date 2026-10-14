@@ -6,7 +6,7 @@
 # It builds one test kernel per boot, boots it under QEMU, reads the
 # machine-readable records from the serial log, and prints a verdict. The
 # record grammar, the idle contract, and the diagnostic locations are
-# documented in README.md.
+# documented in ABOUT.md.
 #
 # Usage:
 #   tests/run-tests.sh --stage N [--no-build]

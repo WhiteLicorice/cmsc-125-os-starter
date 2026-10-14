@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT
  *
  * The record writer. A test kernel links this file under -DKTEST.
- * The record grammar is documented in README.md.
+ * The record grammar is documented in ABOUT.md.
  *
  * Every record starts on a new line. The controller accepts a record only at
  * the start of a line, so case console output cannot merge into a record.

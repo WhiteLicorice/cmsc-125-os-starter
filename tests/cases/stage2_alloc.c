@@ -2,7 +2,7 @@
  *
  * Stage 2 seed case: page allocation and page tables.
  *
- * T05 writes the full suite. This seed checks allocation alignment and zero
+ * The full suite is added later. This seed checks allocation alignment and zero
  * fill, and the two-level page table that map_page builds.
  */
 #include "assert.h"
