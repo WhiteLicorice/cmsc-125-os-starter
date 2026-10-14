@@ -2,9 +2,10 @@
 #
 # Build, run, and test the CMSC 125 RV32 operating system.
 #
-# The starter and the reference OS share this file byte for byte. The file
-# adapts on its own: it builds the user-mode shell and the disk image only
-# when the tree carries shell.c.
+# The starter and the reference OS share this file byte for byte. The reference
+# OS is instructor material, and a student does not have it. The file adapts on
+# its own: it builds the user-mode shell and the disk image only when the tree
+# carries shell.c.
 #
 # Override any tool on the command line, for example:
 #   make CC=/opt/homebrew/opt/llvm/bin/clang QEMU=qemu-system-riscv32
@@ -15,7 +16,22 @@
 #   make disk            build the disk image
 #   make test STAGE=N    run every test case of stages 1 to N
 #   make test-harness    run the controller self-tests
+#   make test-disk       build the pristine test image
 #   make clean           remove the build directory
+#
+# macOS targets. Install the toolchain with Homebrew:
+#   brew install llvm lld qemu
+# Each target sets CC to Homebrew's clang, because Apple's clang has no 32-bit
+# RISC-V target. Each target also puts Homebrew's LLVM bin folder and Homebrew's
+# bin folder ahead of PATH, so ld.lld and llvm-objcopy resolve. A target stops
+# at once when brew is not on PATH.
+#
+#   make build-mac           build the kernel
+#   make run-mac             boot the kernel interactively
+#   make disk-mac            build the disk image
+#   make test-mac STAGE=N    run every test case of stages 1 to N
+#   make test-harness-mac    run the controller self-tests
+#   make test-disk-mac       build the pristine test image
 
 # GNU Make defines CC=cc as a built-in default, so "CC ?= clang" would keep
 # cc. Raise clang only over that built-in default. A caller still wins, from
@@ -26,6 +42,13 @@ CC       := clang
 endif
 OBJCOPY  ?= llvm-objcopy
 QEMU     ?= qemu-system-riscv32
+
+# The Homebrew prefix, the Homebrew LLVM bin folder, and the PATH a -mac target
+# exports. These are recursive, so Homebrew runs only when a -mac target reads
+# the value. A prefix that is empty is the same as a missing brew.
+BREW_PREFIX  = $(shell brew --prefix 2>/dev/null)
+MAC_LLVM_BIN = $(BREW_PREFIX)/opt/llvm/bin
+MAC_PATH     = $(MAC_LLVM_BIN):$(BREW_PREFIX)/bin:$(PATH)
 
 # Ubuntu 24.04's QEMU ships no riscv32 OpenSBI image, so the firmware is
 # vendored and named explicitly.
@@ -46,7 +69,8 @@ KERNEL_SRCS := kernel.c common.c
 BASE_ID      = $(shell sh tests/build-id.sh '' '$(CFLAGS)' '$(CC)' 2>/dev/null)
 KERNEL_DEFS = -DKTEST_BUILD_ID=\"$(BASE_ID)\"
 
-# The reference OS carries the user-mode shell and the file system.
+# The reference OS (instructor only) carries the user-mode shell and the file
+# system.
 HAS_USER := $(if $(wildcard shell.c),1,)
 
 DISK_SRCS := $(wildcard disk/*.txt)
@@ -55,7 +79,8 @@ DISK_ARGS := -drive id=drive0,file=$(BUILD)/disk.tar,format=raw,if=none \
 RUN_DRIVE := $(if $(HAS_USER),$(DISK_ARGS),)
 SHELL_OBJ := $(if $(HAS_USER),$(BUILD)/shell.bin.o,)
 
-.PHONY: all run disk test test-harness test-disk print-test-flags print-test-cc clean FORCE
+.PHONY: all run disk test test-harness test-disk print-test-flags print-test-cc clean FORCE \
+        require-brew build-mac run-mac disk-mac test-mac test-harness-mac test-disk-mac
 
 all: $(BUILD)/kernel.elf
 
@@ -138,3 +163,36 @@ test-harness:
 
 clean:
 	rm -rf $(BUILD)
+
+# The -mac targets. require-brew stops a target at once, with one message, when
+# brew is missing. Each target then runs the base target as a sub-make with the
+# Homebrew compiler and the Homebrew PATH.
+require-brew:
+	@if [ -z "$(BREW_PREFIX)" ]; then \
+	    echo "error: brew is not on PATH. Install Homebrew, then run 'brew install llvm lld qemu'." >&2; \
+	    exit 1; \
+	fi
+
+build-mac: require-brew
+	@export PATH="$(MAC_PATH)"; \
+	    $(MAKE) all CC="$(MAC_LLVM_BIN)/clang"
+
+run-mac: require-brew
+	@export PATH="$(MAC_PATH)"; \
+	    $(MAKE) run CC="$(MAC_LLVM_BIN)/clang"
+
+disk-mac: require-brew
+	@export PATH="$(MAC_PATH)"; \
+	    $(MAKE) disk CC="$(MAC_LLVM_BIN)/clang"
+
+test-mac: require-brew
+	@export PATH="$(MAC_PATH)"; \
+	    $(MAKE) test STAGE="$(STAGE)" CC="$(MAC_LLVM_BIN)/clang"
+
+test-harness-mac: require-brew
+	@export PATH="$(MAC_PATH)"; \
+	    $(MAKE) test-harness CC="$(MAC_LLVM_BIN)/clang"
+
+test-disk-mac: require-brew
+	@export PATH="$(MAC_PATH)"; \
+	    $(MAKE) test-disk CC="$(MAC_LLVM_BIN)/clang"
