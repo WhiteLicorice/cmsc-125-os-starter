@@ -1,0 +1,9 @@
+# Every file in this repository is LF on every platform.
+#
+# The monorepo keeps core.autocrlf on. This rule makes a Windows checkout of
+# the starter write LF, so the shell scripts run in WSL and the build identity
+# hash does not depend on the platform.
+* text=auto eol=lf
+
+# The vendored OpenSBI firmware is a binary. Git must not normalize it.
+firmware/*.bin binary

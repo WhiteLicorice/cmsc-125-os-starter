@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MIT
+#
+# The public test workflow.
+#
+# Set STAGE to the highest stage you have implemented. The workflow runs the
+# same command as the local gate. It is red until that stage passes, which is
+# the correct starting state.
+
+name: test
+
+on:
+  push:
+  pull_request:
+
+env:
+  STAGE: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm lld qemu-system-misc
+
+      - name: Print the selected stage
+        run: echo "STAGE=$STAGE"
+
+      - name: Run the stage tests
+        run: make test STAGE=$STAGE
