@@ -3,8 +3,12 @@
 # The public test workflow.
 #
 # Set STAGE to the highest stage you have implemented. The workflow runs the
-# same command as the local gate. It is red until that stage passes, which is
-# the correct starting state.
+# same command as the local gate. Each job is red until that stage passes,
+# which is the correct starting state. The Ubuntu job and the macOS job grade
+# the same commit, so both jobs stay red until the stage passes.
+#
+# The macOS job runs the -mac targets. Apple's clang has no 32-bit RISC-V
+# target, so the -mac targets select Homebrew's clang and PATH.
 
 name: test
 
@@ -17,17 +21,32 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-24.04
+    strategy:
+      # Keep both jobs running. A red Ubuntu job must not hide the macOS result.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install the toolchain
+      - name: Install the toolchain (Ubuntu)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y clang llvm lld qemu-system-misc
 
+      - name: Install the toolchain (macOS)
+        if: runner.os == 'macOS'
+        run: brew install llvm lld qemu
+
       - name: Print the selected stage
         run: echo "STAGE=$STAGE"
 
-      - name: Run the stage tests
+      - name: Run the stage tests (Ubuntu)
+        if: runner.os == 'Linux'
         run: make test STAGE=$STAGE
+
+      - name: Run the stage tests (macOS)
+        if: runner.os == 'macOS'
+        run: make test-mac STAGE=$STAGE
