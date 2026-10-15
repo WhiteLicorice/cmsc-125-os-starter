@@ -23,7 +23,7 @@ state for a fresh fork.
 | `tests/parse-log.awk` | The transcript parser. It decides the verdict |
 | `tests/serial-client.py` | The console client for a case that reads input |
 | `tests/manifest.tsv` | The case list, with the count, boots, fault, and input of each case |
-| `tests/cases/` | The stage seed cases. One case per stage |
+| `tests/cases/` | The stage test cases |
 | `tests/selftest/` | The controller self-tests |
 | `firmware/` | The vendored OpenSBI firmware and its licence |
 
