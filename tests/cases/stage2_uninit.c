@@ -3,9 +3,11 @@
  * Stage 2 case: every allocated page reads as zero, even a recycled one.
  *
  * The case first reads a fresh page. It then dirties the page the allocator
- * will hand out next, asks for that page, and reads it back. A correct
- * allocator zeroes the page before it returns, so the dirty bytes are gone. An
- * allocator that skips the zeroing returns the dirty bytes and fails here.
+ * will hand out next, asks for that page, and reads it back. It dirties every
+ * page a three-page block will occupy, asks for the block, and reads all three
+ * pages back. A correct allocator zeroes each returned page before it returns,
+ * so the dirty bytes are gone. An allocator that skips the zeroing, or zeroes
+ * only part of a multi-page block, returns the dirt and fails here.
  *
  * The starter has no allocator, so the build fails on the starter. That
  * failure is the expected start state.
@@ -46,8 +48,17 @@ void ktest_main(void) {
     /* The recycled page is zero, not the dirt left on it. */
     KTEST_ASSERT(page_is_zero((const uint8_t *) q));
 
+    /* Dirty every page the three-page block will occupy, so a zero fill that
+     * stops after the first page leaves the later pages dirty. */
+    for (uint32_t i = 0; i < PAGE_SIZE; i++) {
+        ((uint8_t *) (p + 2 * PAGE_SIZE))[i] = 0x5A;
+        ((uint8_t *) (p + 3 * PAGE_SIZE))[i] = 0x5A;
+        ((uint8_t *) (p + 4 * PAGE_SIZE))[i] = 0x5A;
+    }
+
     /* A multi-page block is zero across all of its pages. */
     paddr_t r = alloc_pages(3);
+    KTEST_ASSERT(r == p + 2 * PAGE_SIZE);
     KTEST_ASSERT(page_is_zero((const uint8_t *) r));
     KTEST_ASSERT(page_is_zero((const uint8_t *) (r + PAGE_SIZE)));
     KTEST_ASSERT(page_is_zero((const uint8_t *) (r + 2 * PAGE_SIZE)));
