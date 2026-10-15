@@ -3,10 +3,10 @@
  * Stage 2 case: a leaf entry carries exactly the requested permission bits.
  *
  * The case maps three pages with different flag sets, then reads the entries
- * back. A leaf entry must hold the requested R, W, X, and U bits plus V, and
- * nothing else. A level-1 entry must hold V alone. A map_page that drops a
- * requested bit, adds an unrequested one, or writes permissions into the
- * level-1 entry fails here.
+ * back. It compares all ten low bits of each entry against the lab's encoding,
+ * not a five-bit subset, so a stray accessed, dirty, or reserved bit fails as
+ * well as a missing or unrequested permission. A leaf must hold the requested
+ * R, W, X, and U bits plus V, and nothing else. A level-1 entry holds V alone.
  *
  * The reference OS (instructor only) runs this case. The starter has no page
  * table, so the build fails on the starter. That failure is the expected start
@@ -19,8 +19,10 @@
 paddr_t alloc_pages(uint32_t n);
 void map_page(uint32_t *table1, uint32_t vaddr, paddr_t paddr, uint32_t flags);
 
-/* The five permission and valid bits, and nothing else. */
-#define PERM_MASK (PAGE_V | PAGE_R | PAGE_W | PAGE_X | PAGE_U)
+/* The ten low bits of an entry. They hold V, R, W, X, and U, and also the
+ * G, A, D, and RSW bits. This lab's encoding leaves the last four clear, so
+ * the case compares all ten. */
+#define LOW_BITS_MASK 0x3ffu
 #define PTE_PPN(pte) ((pte) >> 10)
 
 /* The leaf entry for vaddr, or NULL when the level-1 entry is absent. */
@@ -50,9 +52,9 @@ void ktest_main(void) {
     uint32_t vpn1_1 = (va1 >> 22) & 0x3ff;
     uint32_t vpn1_3 = (va3 >> 22) & 0x3ff;
 
-    /* A level-1 entry carries V alone. */
-    KTEST_ASSERT((table1[vpn1_1] & PERM_MASK) == PAGE_V);
-    KTEST_ASSERT((table1[vpn1_3] & PERM_MASK) == PAGE_V);
+    /* A level-1 entry carries V alone, across all ten low bits. */
+    KTEST_ASSERT((table1[vpn1_1] & LOW_BITS_MASK) == PAGE_V);
+    KTEST_ASSERT((table1[vpn1_3] & LOW_BITS_MASK) == PAGE_V);
 
     /* The level-1 entries name distinct level-0 tables. */
     KTEST_ASSERT(PTE_PPN(table1[vpn1_1]) != PTE_PPN(table1[vpn1_3]));
@@ -61,9 +63,9 @@ void ktest_main(void) {
     uint32_t *leaf1 = leaf_entry(table1, va1);
     uint32_t *leaf2 = leaf_entry(table1, va2);
     uint32_t *leaf3 = leaf_entry(table1, va3);
-    KTEST_ASSERT((*leaf1 & PERM_MASK) == (PAGE_V | PAGE_R | PAGE_W));
-    KTEST_ASSERT((*leaf2 & PERM_MASK) == (PAGE_V | PAGE_R | PAGE_X | PAGE_U));
-    KTEST_ASSERT((*leaf3 & PERM_MASK) == (PAGE_V | PAGE_R));
+    KTEST_ASSERT((*leaf1 & LOW_BITS_MASK) == (PAGE_V | PAGE_R | PAGE_W));
+    KTEST_ASSERT((*leaf2 & LOW_BITS_MASK) == (PAGE_V | PAGE_R | PAGE_X | PAGE_U));
+    KTEST_ASSERT((*leaf3 & LOW_BITS_MASK) == (PAGE_V | PAGE_R));
 
     /* The leaf names the requested physical page. */
     KTEST_ASSERT(PTE_PPN(*leaf1) == pa / PAGE_SIZE);
