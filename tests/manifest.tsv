@@ -16,5 +16,10 @@ stage1_switch	1	tests/cases/stage1_switch.c	8	1	-	-
 stage1_regs	1	tests/cases/stage1_regs.c	26	1	-	-
 stage1_stack	1	tests/cases/stage1_stack.c	5	1	-	-
 stage2_alloc	2	tests/cases/stage2_alloc.c	8	1	-	-
+stage2_align	2	tests/cases/stage2_align.c	8	1	-	-
+stage2_uninit	2	tests/cases/stage2_uninit.c	7	1	-	-
+stage2_map	2	tests/cases/stage2_map.c	12	1	-	-
+stage2_flags	2	tests/cases/stage2_flags.c	9	1	-	-
+stage2_fault	2	tests/cases/stage2_fault.c	2	1	unexpected trap scause=0000000d, stval=01000000	-
 stage3_syscall	3	tests/cases/stage3_syscall.c	8	1	-	-
 stage4_fs	4	tests/cases/stage4_fs.c	6	1	-	-
