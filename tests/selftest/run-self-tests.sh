@@ -362,7 +362,7 @@ empty_deps_check() {
 empty_deps_check
 
 # A case-local header whose name holds a dollar. The compiler escapes the
-# dollar as "$$", and a readable decoy with the doubled name sits beside the
+# dollar as "$$". A readable decoy with the doubled name sits beside the
 # real header. Only the real header changes, so the identity must detect it.
 dollar_header_check() {
     local got
@@ -459,7 +459,7 @@ deps_scan_check
 
 # This check runs a fixture with a compiler command that includes an argument. The
 # fixture must split KTEST_BASE_CC the way the controller does: plain words
-# with globbing off, and its own arguments kept apart. A quoted command would
+# with globbing off. Its own arguments kept apart. A quoted command would
 # name one program, so the compile would never start.
 fixture_cc_args_check() {
     local fixture="$harness_tmp/no-deps-clang" src="$harness_tmp/fixture-args.c"
