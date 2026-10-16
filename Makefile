@@ -2,7 +2,7 @@
 #
 # Build, run, and test the CMSC 125 RV32 operating system.
 #
-# The file adapts on its own: it builds the user-mode shell and the disk image
+# The file adapts on its own. It builds the user-mode shell and the disk image
 # only when the tree carries shell.c.
 #
 # Override any tool on the command line, for example:
