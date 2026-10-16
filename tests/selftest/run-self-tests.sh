@@ -459,7 +459,7 @@ deps_scan_check
 
 # This check runs a fixture with a compiler command that includes an argument. The
 # fixture must split KTEST_BASE_CC the way the controller does: plain words
-# with globbing off. Its own arguments kept apart. A quoted command would
+# with globbing off. The fixture keeps its own arguments separate. A quoted command would
 # name one program, so the compile would never start.
 fixture_cc_args_check() {
     local fixture="$harness_tmp/no-deps-clang" src="$harness_tmp/fixture-args.c"
