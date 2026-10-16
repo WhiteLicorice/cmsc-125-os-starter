@@ -37,7 +37,7 @@ if [ -n "$case_src" ]; then
     srcs="$srcs $case_src"
 fi
 
-# The compiler writes one rule per source and names every header the source
+# The compiler writes one rule per source and lists every header the source
 # reads. The Makefile and the controller pass the same compiler and flags, so
 # both sides see one dependency list.
 #
@@ -67,7 +67,7 @@ done
 deps="$(cat "$depfile")"
 
 # Parse the make rules. A rule is "target: dependency ...", the rule may
-# continue on the next line after a trailing backslash, and a name escapes a
+# continue on the next line after a trailing backslash. A name escapes a
 # space as "\ " and a dollar as "$$". Decode the dollar escape before the
 # readability check and the hash. Drop the rule target, keep every dependency
 # name whole, and sort for a stable order. The compiler does not name the
