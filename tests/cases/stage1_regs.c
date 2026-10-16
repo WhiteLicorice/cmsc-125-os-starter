@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Stage 1 case: a context switch preserves the callee-saved registers.
+ * This Stage 1 case checks that a context switch preserves callee-saved registers.
  *
  * Two kernel-mode test processes load s0 to s11 with known values, yield, and
  * read the registers back after they resume. The case asserts that each process
@@ -23,7 +23,7 @@ extern struct process *idle_proc;
 #define REGS_BASE_B 0xBB000
 #define REGS_N 12
 
-/* Expand a macro argument before it is turned into a string. */
+/* The preprocessor expands each argument before it creates a string literal. */
 #define STR2(x) #x
 #define STR(x) STR2(x)
 
@@ -33,8 +33,8 @@ static uint32_t regs_seen[2][REGS_N] __attribute__((used));
 static int regs_ran;
 
 /* Each worker loads the twelve registers, yields, and stores them back. The
- * other worker runs in between and loads its own values, so a register that
- * switch_context does not preserve holds the other worker's value on return. */
+ * other worker runs in between and loads its own values. If switch_context
+ * fails to save or restore one register, a process can read the other process's value. */
 #define REGS_WORKER(name, base, off)                                     \
     static void name(void) {                                             \
         __asm__ __volatile__(                                            \

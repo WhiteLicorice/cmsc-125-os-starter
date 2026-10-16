@@ -5,8 +5,9 @@
  * The compiler escapes the dollar as "$$" in its dependency list. A second
  * readable file named "dollar$$name.h" sits beside the real header. The
  * self-test changes only the real header and runs the old image with
- * --no-build. The controller must report "stale-build", so the identity must
- * hash the file the compiler read, not the doubled-dollar decoy.
+ * --no-build. The identity must use the dependency path the compiler reports.
+ * This check changes the real header and expects "stale-build". It leaves the
+ * doubled-dollar decoy unchanged.
  */
 #include "assert.h"
 #include "dollar$name.h"

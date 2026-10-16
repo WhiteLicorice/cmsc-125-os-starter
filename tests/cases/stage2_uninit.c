@@ -45,7 +45,7 @@ void ktest_main(void) {
     paddr_t q = alloc_pages(1);
     KTEST_ASSERT(q == p + PAGE_SIZE);
 
-    /* The recycled page is zero, not the dirt left on it. */
+    /* The allocator returns the recycled page with every byte set to zero. */
     KTEST_ASSERT(page_is_zero((const uint8_t *) q));
 
     /* Dirty every page the three-page block will occupy, so a zero fill that

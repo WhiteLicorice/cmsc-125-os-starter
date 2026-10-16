@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: MIT
  *
- * Stage 1 case: a process keeps stack-local state across several yields.
+ * This Stage 1 case checks that a process keeps stack-local state across several yields.
  *
  * The case starts two kernel-mode test processes. Each process fills a local
- * array, yields, and checks the array after each yield. The tag for the array
- * comes from the process identity, and the check recomputes the tag, so a
- * process that reads another process's stack sees a mismatch straight away.
+ * array, yields, and checks the array after each yield. The tag comes from
+ * the process identity. The check recomputes it. A process that reads another
+ * process's stack sees a mismatch straight away.
  *
  * The case first asserts that the two processes hold distinct stacks. A
  * create_process that shares one stack between processes fails that assertion.

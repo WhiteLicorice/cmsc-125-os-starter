@@ -4,10 +4,10 @@
  *
  * The case asks for single pages and one multi-page block, then checks that
  * every returned address lies on a page boundary and that each block begins at
- * or after the end of the previous one. It fills the block, takes one more
- * page, and checks that the successor starts past the block's full extent and
- * that the block's bytes survive. A block that is misaligned, one that
- * overlaps its neighbor, or one whose reserved extent is too short fails here.
+ * or after the end of the previous one. The case fills the block and takes one
+ * more page. A valid result places the successor after all four pages and
+ * preserves the block's bytes. Misalignment, overlap, or a short reserved
+ * extent fails the test.
  *
  * The starter has no allocator, so the build fails on the starter. That
  * failure is the expected start state.
@@ -63,8 +63,8 @@ void ktest_main(void) {
     KTEST_ASSERT(d >= c + PAGE_SIZE);
     KTEST_ASSERT((paddr_t) __free_ram_end - d >= 4 * PAGE_SIZE);
 
-    /* Reserve the block, fill it, and take one more page. The successor must
-     * start past the block's four pages, and the block's bytes must survive. */
+    /* The allocator reserves four pages, then fills them with a pattern. The next
+     * allocation must start after those pages. Every byte must retain its pattern. */
     fill_block((uint8_t *) d, 4);
 
     paddr_t e = alloc_pages(1);

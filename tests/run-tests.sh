@@ -26,8 +26,8 @@ root="$(cd "$here/.." && pwd)"
 build="$root/build"
 logs="$build/logs"
 tmp="$build/tmp"
-# A Unix socket path is limited to 108 bytes, so the console socket lives in a
-# short temporary directory, not under build/.
+# The Unix socket limit is 108 bytes, so the console socket uses a short path
+# under TMPDIR.
 sock_dir="$(mktemp -d "${TMPDIR:-/tmp}/ktest.XXXXXX")"
 
 QEMU="${QEMU:-qemu-system-riscv32}"

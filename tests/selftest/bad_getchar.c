@@ -2,7 +2,7 @@
  *
  * Self-test fixture: a missing input.
  *
- * The controller supplies no input, because the fixture does not exist. The
+ * The controller supplies no input because the fixture does not exist. The
  * case waits for a byte that never comes, so the boot ends at the deadline
  * with no completion record. It needs the stage 3 syscall mechanism.
  */

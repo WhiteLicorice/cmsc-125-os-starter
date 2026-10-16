@@ -1,13 +1,12 @@
 /* SPDX-License-Identifier: MIT
  *
- * Stage 2 negative case: a load through an unmapped page faults with a known
- * cause.
+ * This Stage 2 negative case checks that a load through an unmapped page
+ * faults with a known cause.
  *
  * The case starts one kernel-mode process. Its page table maps the kernel but
- * carries no user image, so USER_BASE stays unmapped. The yield switches to
- * that process's page table first, so the read runs with translation on. The
- * read raises a load page fault, and the trap handler panics with the cause and
- * the faulting address.
+ * leaves USER_BASE unmapped. A yield selects the process's page table before
+ * the load. The unmapped load raises a page fault. The trap handler then panics
+ * with the cause and faulting address.
  *
  * The manifest declares that PANIC pattern. The case passes only when that
  * pattern appears, alone, after the begin record. A run with no fault, or with

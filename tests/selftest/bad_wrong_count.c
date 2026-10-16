@@ -1,9 +1,7 @@
 /* SPDX-License-Identifier: MIT
  *
- * Self-test fixture: a wrong assertion count.
- *
- * The case prints three assertions. The self-test declares two, so the
- * controller must report "wrong-assertion-count".
+ * This fixture prints three assertions. The self-test expects two. The
+ * controller reports "wrong-assertion-count".
  */
 #include "assert.h"
 
