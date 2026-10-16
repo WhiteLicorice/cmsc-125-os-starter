@@ -8,8 +8,8 @@
 # record grammar, the idle contract, and the diagnostic locations are
 # documented in ABOUT.md.
 #
-# The starter and the reference OS share this file byte for byte. The reference
-# OS is instructor material, and a student does not have it.
+# This file is byte-identical in the starter and reference OS. Students use the
+# starter. Instructors use the reference OS.
 #
 # Usage:
 #   tests/run-tests.sh --stage N [--no-build]
@@ -29,8 +29,8 @@ root="$(cd "$here/.." && pwd)"
 build="$root/build"
 logs="$build/logs"
 tmp="$build/tmp"
-# A Unix socket path is limited to 108 bytes, so the console socket lives in a
-# short temporary directory, not under build/.
+# The Unix socket limit is 108 bytes, so the console socket uses a short path
+# under TMPDIR.
 sock_dir="$(mktemp -d "${TMPDIR:-/tmp}/ktest.XXXXXX")"
 
 QEMU="${QEMU:-qemu-system-riscv32}"

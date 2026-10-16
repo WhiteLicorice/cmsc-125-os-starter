@@ -1,12 +1,11 @@
 /* SPDX-License-Identifier: MIT
  *
- * Stage 2 case: a leaf entry carries exactly the requested permission bits.
+ * This Stage 2 case checks that each leaf carries the requested permission bits and V.
  *
  * The case maps three pages with different flag sets, then reads the entries
- * back. It compares all ten low bits of each entry against the lab's encoding,
- * not a five-bit subset, so a stray accessed, dirty, or reserved bit fails as
- * well as a missing or unrequested permission. A leaf must hold the requested
- * R, W, X, and U bits plus V, and nothing else. A level-1 entry holds V alone.
+ * back. It compares all ten low bits of each entry with the lab's encoding.
+ * This check catches stray accessed, dirty, or reserved bits. A leaf must hold
+ * the requested R, W, X, and U bits plus V. A level-1 entry holds V alone.
  *
  * The case then maps one page again with reduced permissions and a new frame.
  * A kernel that writes the leaf with `|=` keeps the old write bit and the old
@@ -60,10 +59,10 @@ void ktest_main(void) {
     KTEST_ASSERT((table1[vpn1_1] & LOW_BITS_MASK) == PAGE_V);
     KTEST_ASSERT((table1[vpn1_3] & LOW_BITS_MASK) == PAGE_V);
 
-    /* The level-1 entries name distinct level-0 tables. */
+    /* The level-1 entries point to distinct level-0 tables. */
     KTEST_ASSERT(PTE_PPN(table1[vpn1_1]) != PTE_PPN(table1[vpn1_3]));
 
-    /* A leaf carries exactly the requested bits, plus V. */
+    /* A leaf carries the requested bits and V, with all other low bits clear. */
     uint32_t *leaf1 = leaf_entry(table1, va1);
     uint32_t *leaf2 = leaf_entry(table1, va2);
     uint32_t *leaf3 = leaf_entry(table1, va3);
@@ -71,7 +70,7 @@ void ktest_main(void) {
     KTEST_ASSERT((*leaf2 & LOW_BITS_MASK) == (PAGE_V | PAGE_R | PAGE_X | PAGE_U));
     KTEST_ASSERT((*leaf3 & LOW_BITS_MASK) == (PAGE_V | PAGE_R));
 
-    /* The leaf names the requested physical page. */
+    /* The leaf entry encodes the requested physical page. */
     KTEST_ASSERT(PTE_PPN(*leaf1) == pa / PAGE_SIZE);
     KTEST_ASSERT(PTE_PPN(*leaf2) == pb / PAGE_SIZE);
     KTEST_ASSERT(PTE_PPN(*leaf3) == pc / PAGE_SIZE);

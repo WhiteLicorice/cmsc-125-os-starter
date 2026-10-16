@@ -69,12 +69,12 @@ for src in $srcs; do
 done
 deps="$(cat "$depfile")"
 
-# Parse the make rules. A rule is "target: dependency ...", the rule may
-# continue on the next line after a trailing backslash. A name escapes a
+# Parse make rules. A rule has a target and one or more dependencies. It may
+# continue on the next line after a trailing backslash. The compiler escapes a
 # space as "\ " and a dollar as "$$". Decode the dollar escape before the
-# readability check and the hash. Drop the rule target, keep every dependency
-# name whole, and sort for a stable order. The compiler does not name the
-# linker script as a dependency, so add kernel.ld by name.
+# readability check and the hash. Drop the rule target. Keep each dependency
+# path whole. Sort the paths for a stable order. The compiler omits the linker
+# script from its dependency list. Add `kernel.ld` explicitly.
 dep_files="$(
     {
         printf '%s\n' "$deps" | awk '
@@ -115,8 +115,8 @@ dep_files="$(
     } | LC_ALL=C sort -u
 )"
 
-# Every named dependency must be readable. A name that is not is an identity
-# failure, so the caller never receives an identity built from a partial list.
+# Every dependency in the list must be readable. The caller receives an
+# identity only after the scan reads the full list.
 while IFS= read -r f; do
     [ -n "$f" ] || continue
     if [ ! -r "$f" ]; then
@@ -127,9 +127,9 @@ done <<EOF
 $dep_files
 EOF
 
-# The list must name every primary source, as the compiler spells it. An empty
-# or partial list is an identity failure: a missing name means the scan did not
-# reach that source, so the hash would not cover a file the kernel compiles.
+# The list must include every primary source as the compiler spells it. An
+# empty or partial list means the identity is incomplete. A missing entry means
+# the scan did not reach that source, so the hash would miss a kernel input.
 if [ -z "$dep_files" ]; then
     echo "error: the compiler listed no build dependencies (CC='$cc')" >&2
     exit 1

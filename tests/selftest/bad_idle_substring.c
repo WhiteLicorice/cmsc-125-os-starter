@@ -1,8 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Self-test fixture: the idle words inside a larger panic message.
- *
- * The panic message contains the accepted idle words but does not equal them.
+ * This fixture includes the accepted idle words in a longer panic message.
  * The controller must report "unrelated-panic".
  */
 #include "assert.h"

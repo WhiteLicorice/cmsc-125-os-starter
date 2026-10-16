@@ -10,8 +10,8 @@
 # A real compile goes to the compiler the caller selected, named by
 # KTEST_BASE_CC, because the system clang carries no RISC-V target on macOS.
 # Split that command the way the controller does: plain words with globbing
-# off. The fixture's own arguments stay intact. A quoted command would name
-# one program, so the compile would never start.
+# off. The fixture's own arguments stay intact.
+# A quoted value would select one program path, so compilation would fail to start.
 for arg in "$@"; do
     [ "$arg" != -M ] || exit 1
 done

@@ -6,8 +6,8 @@
  * Every record starts on a new line. The controller accepts a record only at
  * the start of a line, so case console output cannot merge into a record.
  *
- * The starter and the reference OS share this file byte for byte. The reference
- * OS is instructor material, and a student does not have it.
+ * This file is byte-identical in the starter and reference OS. Students use the
+ * starter. Instructors use the reference OS.
  */
 #include "assert.h"
 

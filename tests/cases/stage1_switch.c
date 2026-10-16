@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Stage 1 case: the cooperative scheduler picks the next runnable process.
+ * This Stage 1 case checks that the cooperative scheduler picks the next runnable process.
  *
  * Two kernel-mode test processes record one step and yield. The scheduler
  * runs them in a fixed order, so the case asserts the order of their steps.

@@ -7,8 +7,8 @@
 # verdict. The persistence and negative-fault self-tests need the file system
 # and the allocator, so the starter skips them. The starter has no shell.c.
 #
-# The starter and the reference OS share this file byte for byte. The reference
-# OS is instructor material, and a student does not have it.
+# This file is byte-identical in the starter and reference OS. Students use the
+# starter. Instructors use the reference OS.
 #
 # Run with: make test-harness
 
@@ -18,9 +18,9 @@ here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 ctrl="$root/tests/run-tests.sh"
 
-# The compiler the caller selected, for the checks that pass a CC command with
-# an argument. A bare "clang" is the system compiler, and the system compiler on
-# macOS carries no RISC-V target, so the checks must start from the caller's CC.
+# These checks pass a CC command with arguments. A bare "clang" selects the
+# system compiler. On macOS, that compiler has no RISC-V target. The checks use
+# the caller's CC value.
 base_cc="${CC:-clang}"
 # The fixture compilers delegate their real compile to this compiler.
 export KTEST_BASE_CC="$base_cc"
@@ -29,8 +29,8 @@ export KTEST_BASE_CC="$base_cc"
 export KTEST_DEADLINE="${KTEST_DEADLINE:-5}"
 export KTEST_POLL="${KTEST_POLL:-0.1}"
 
-# The backups live outside build/, because the controller removes build/tmp on
-# every exit path.
+# The controller removes build/tmp on every exit path. Keep these backups
+# outside build/.
 harness_tmp="$(mktemp -d)"
 kernel_src="$root/kernel.c"
 kernel_bak="$harness_tmp/kernel.c"
@@ -107,12 +107,11 @@ verdict_of() {
 # verdict_cc CC ARGS... runs the controller with CC set for the controller and
 # every process it starts.
 #
-# The CC assignment must reach the controller's own make calls, not only the
-# controller. MAKEFLAGS and MAKEOVERRIDES are cleared for that reason. GNU make
-# passes a command-line variable such as CC=... to every sub-make through
-# MAKEFLAGS, and a MAKEFLAGS assignment outranks the environment. Without the
-# clear, "make CC=... test-harness" would hand the outer CC to the controller
-# and skip the fixture. The assignment itself precedes the bash command.
+# The CC assignment must reach the controller's make calls and every child
+# build. GNU make passes a command-line variable such as CC=... to each sub-make
+# through MAKEFLAGS. A MAKEFLAGS assignment outranks the environment. Without
+# clearing MAKEFLAGS, "make CC=... test-harness" would pass the outer CC to the
+# controller and skip the fixture. Place the assignment before bash.
 verdict_cc() {
     local cc=$1
     shift
@@ -135,7 +134,7 @@ verdict_qemu() {
 }
 
 # report LABEL CASE EXPECTED_VERDICT GOT
-# LABEL names the check. CASE names the controller verdict it expects.
+# LABEL identifies the check. CASE identifies the controller verdict it expects.
 report() {
     local label=$1 case=$2 want=$3 got=$4
     if [ "$got" = "KTEST VERDICT case=$case result=$want" ]; then
@@ -215,7 +214,8 @@ check good_prefixed_fault "pass reason=ok" \
 check stale_probe "pass reason=ok" \
     --case stale_probe --source tests/selftest/stale_probe.c --assertions 1
 
-# A stale build artifact: change a kernel source, run without rebuilding.
+# This test changes a kernel source. It runs the old image without rebuilding
+# and expects "stale-build".
 stale_check() {
     local got
     ran=$((ran + 1))
@@ -230,7 +230,8 @@ stale_check() {
 }
 stale_check
 
-# A stale case source: change the case, run the old image without rebuilding.
+# This test changes a case source. It runs the old image without rebuilding
+# and expects "stale-build".
 stale_case_check() {
     local got
     ran=$((ran + 1))
@@ -247,8 +248,8 @@ stale_case_check() {
 }
 stale_case_check
 
-# A stale case-local header: change a header beside the case, run the old image
-# without rebuilding. The identity covers every header the compiler reads.
+# This test changes a case-local header and runs the old image without
+# rebuilding. The identity covers every header the compiler reads.
 header_check() {
     local got
     ran=$((ran + 1))
@@ -265,8 +266,8 @@ header_check() {
 }
 header_check
 
-# A stale linker script: change kernel.ld, run the old image without rebuilding.
-# The identity covers the linker script, not only the compiler dependencies.
+# This test changes kernel.ld and runs the old image without rebuilding.
+# The identity includes the linker script and the compiler dependencies.
 linker_check() {
     local got
     ran=$((ran + 1))
@@ -380,8 +381,8 @@ dollar_header_check() {
 }
 dollar_header_check
 
-# A BUILD override reaches the kernel recipe without a named goal. The kernel
-# recipe, not a parse-time goal filter, must stop an empty identity.
+# A BUILD override reaches the kernel recipe without a named goal. The recipe
+# must stop the build when its identity is empty.
 guard_check() {
     local wrapper="$harness_tmp/no-deps-clang" out rc
     cp "$root/tests/selftest/no-deps-clang" "$wrapper"
@@ -459,8 +460,8 @@ deps_scan_check
 
 # This check runs a fixture with a compiler command that includes an argument. The
 # fixture must split KTEST_BASE_CC the way the controller does: plain words
-# with globbing off. The fixture keeps its own arguments separate. A quoted command would
-# name one program, so the compile would never start.
+# with globbing off. The fixture keeps its own arguments separate.
+# A quoted value would select one program path, so compilation would fail to start.
 fixture_cc_args_check() {
     local fixture="$harness_tmp/no-deps-clang" src="$harness_tmp/fixture-args.c"
     local obj="$harness_tmp/fixture-args.o" out rc

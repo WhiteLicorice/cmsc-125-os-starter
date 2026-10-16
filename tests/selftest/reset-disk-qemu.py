@@ -8,8 +8,8 @@
 # The harness copies this file to a temporary path and makes it executable. It
 # sets KTEST_RESET_IMAGE to the pristine image.
 #
-# The starter and the reference OS share this file byte for byte. The reference
-# OS is instructor material, and a student does not have it.
+# This file is byte-identical in the starter and reference OS. Students use the
+# starter. Instructors use the reference OS.
 
 import os
 import shutil

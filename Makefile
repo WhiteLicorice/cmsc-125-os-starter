@@ -108,7 +108,7 @@ $(BUILD)/shell.bin: $(BUILD)/shell.elf
 $(BUILD)/shell.bin.o: $(BUILD)/shell.bin
 	cd $(BUILD) && $(OBJCOPY) -I binary -O elf32-littleriscv shell.bin shell.bin.o
 
-# One test kernel: the production kernel objects, the record writer, and one
+# The test kernel links the production kernel objects, the record writer, and one
 # test case. The controller sets CASE, SRC, and BOOT.
 #
 # FORCE rebuilds the executable on every controller call, so a case change can
