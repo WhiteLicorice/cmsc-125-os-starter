@@ -4,7 +4,7 @@
  * KTEST_ASSERT. The record grammar is documented in ABOUT.md.
  *
  * The starter and the reference OS share this file byte for byte. The reference
- * OS is instructor material, and a student does not have it.
+ * OS is instructor material. A student does not have it.
  */
 #pragma once
 

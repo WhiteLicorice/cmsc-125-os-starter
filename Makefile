@@ -3,8 +3,8 @@
 # Build, run, and test the CMSC 125 RV32 operating system.
 #
 # The starter and the reference OS share this file byte for byte. The reference
-# OS is instructor material, and a student does not have it. The file adapts on
-# its own: it builds the user-mode shell and the disk image only when the tree
+# OS is instructor material. A student does not have it. The file adapts on
+# its own. It builds the user-mode shell and the disk image only when the tree
 # carries shell.c.
 #
 # Override any tool on the command line, for example:
