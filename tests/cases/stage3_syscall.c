@@ -1,9 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Stage 3 seed case: applications and system calls.
- *
- * The full suite is added later. This seed checks the trap-frame ABI, the system
- * call dispatch, and the user-mode mapping that create_process builds.
+ * Stage 3 checks the user call interface and process mapping.
  */
 #include "assert.h"
 #include "kernel.h"
@@ -29,6 +26,11 @@ void ktest_main(void) {
     putchar('\n'); /* End the console output, so the next record starts a line. */
     KTEST_ASSERT(f.a0 == 'K');
 
+    memset(&f, 0, sizeof(f));
+    f.a3 = SYS_GETCHAR;
+    handle_syscall(&f);
+    KTEST_ASSERT(f.a0 == 'Q');
+
     struct process *p = create_process(image, PAGE_SIZE);
     KTEST_ASSERT(p != NULL);
     KTEST_ASSERT(p->state == PROC_RUNNABLE);
@@ -40,7 +42,6 @@ void ktest_main(void) {
     uint32_t *table0 = (uint32_t *) ((p->page_table[vpn1] >> 10) * PAGE_SIZE);
     KTEST_ASSERT((table0[vpn0] & (PAGE_V | PAGE_U)) == (PAGE_V | PAGE_U));
 
-    /* Leave no runnable process behind, so the kernel reaches the idle state. */
     p->state = PROC_UNUSED;
 
     ktest_end("stage3_syscall");

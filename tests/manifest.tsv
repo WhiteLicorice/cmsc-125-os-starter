@@ -21,5 +21,8 @@ stage2_uninit	2	tests/cases/stage2_uninit.c	8	1	-	-
 stage2_map	2	tests/cases/stage2_map.c	12	1	-	-
 stage2_flags	2	tests/cases/stage2_flags.c	13	1	-	-
 stage2_fault	2	tests/cases/stage2_fault.c	2	1	unexpected trap scause=0000000d, stval=01000000	-
-stage3_syscall	3	tests/cases/stage3_syscall.c	8	1	-	-
+stage3_syscall	3	tests/cases/stage3_syscall.c	9	1	-	tests/fixtures/stage3_getchar.txt
+stage3_user_app	3	tests/cases/stage3_user_app.c	4	1	-	-
+stage3_user_illegal	3	tests/cases/stage3_user_illegal.c	0	1	unexpected trap scause=00000002	-
+stage3_user_protection	3	tests/cases/stage3_user_protection.c	0	1	unexpected trap scause=0000000f, stval=80200000	-
 stage4_fs	4	tests/cases/stage4_fs.c	6	1	-	-
