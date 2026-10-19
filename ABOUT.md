@@ -136,12 +136,12 @@ console output never merges into a record.
     KTEST IDLE
 
 The expression is the rest of the line. The controller reads the transcript
-structure. It requires exactly one build record and exactly one begin record with the case name,
-the assertions between those records, and exactly one end record. The end record must
-list the case name. Its counts must match the assertions and the count in
-`tests/manifest.tsv`. Malformed, duplicate, or out-of-order records fail the case. Records after a
-panic also fail. A panic ends the transcript. A positive case passes only with no
-failed assertion.
+structure. It requires exactly one build record and exactly one begin record with the case
+name. Assertions must appear between the begin and end records. It requires exactly one
+end record. The end record must list the case name. Its counts must match the assertions
+and the count in `tests/manifest.tsv`. Malformed, duplicate, or out-of-order records fail
+the case. Records after a panic also fail. A panic ends the transcript. A positive case
+passes only with no failed assertion.
 
 The build identity hashes the compiler dependency list, linker script `kernel.ld`,
 selected case path, and compiler flags. The dependency list includes each file
