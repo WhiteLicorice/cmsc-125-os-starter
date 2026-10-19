@@ -2,12 +2,12 @@
  *
  * Stage 2 case: every allocated page reads as zero, even a recycled one.
  *
- * The case first reads a fresh page. It then dirties the page the allocator
- * will hand out next, asks for that page, and reads it back. It dirties every
- * page a three-page block will occupy, asks for the block, and reads all three
- * pages back. A correct allocator zeroes each returned page before it returns,
- * so the dirty bytes are gone. An allocator that skips the zeroing, or zeroes
- * only part of a multi-page block, returns the dirt and fails here.
+ * The case reads a fresh page first. Then it dirties the next page the allocator
+ * will return, requests that page, and reads it back. It dirties each page in a
+ * three-page block. The case requests the block and reads all three pages back.
+ * The allocator must zero each page before it returns the block. The dirty bytes
+ * must be gone. An allocator that skips zeroing, or zeroes only part of a block,
+ * returns the dirt and fails here.
  *
  * The starter has no allocator, so the build fails on the starter. That
  * failure is the expected start state.

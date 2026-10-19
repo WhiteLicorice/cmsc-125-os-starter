@@ -118,9 +118,9 @@ against the production kernel objects and defines `KTEST`. In test mode
 only. A case never contains a substitute scheduler, allocator, page table, or
 file system.
 
-The stage 1 to 4 cases fail on the starter, because the starter has no such
-mechanism. The build error identifies the missing symbol. Each case passes when
-you implement its stage.
+The starter lacks the mechanisms for stages 1 to 4, so those cases fail. The
+build error identifies the missing symbol. A case passes when you implement its
+stage.
 
 ## Record grammar
 
@@ -135,23 +135,22 @@ console output never merges into a record.
     KTEST END name=<case> assertions=<n> failures=<n>
     KTEST IDLE
 
-The expression is the rest of the line. The controller reads the structure of
-the whole transcript. It requires exactly one build record, one begin record
-with the case name, the assertions between the begin and the end record, and
-exactly one end record. The end record must name the case, and its counts must
-match the assertions and the count in `tests/manifest.tsv`. A malformed,
-duplicate, or out-of-order record fails the case. A record after a panic fails
-the case. A panic ends the transcript. A positive case passes only with no
+The expression is the rest of the line. The controller reads the transcript
+structure. It requires exactly one build record and exactly one begin record with the case name,
+the assertions between those records, and exactly one end record. The end record must
+list the case name. Its counts must match the assertions and the count in
+`tests/manifest.tsv`. Malformed, duplicate, or out-of-order records fail the case. Records after a
+panic also fail. A panic ends the transcript. A positive case passes only with no
 failed assertion.
 
-The build identity is a hash of the compiler dependency list, the linker script
-`kernel.ld`, the selected case path, and the compiler flags. The dependency list
-holds every file the compiler reads, including a header beside the case and a
-header whose name holds a space. The Makefile embeds the identity in the test
+The build identity hashes the compiler dependency list, linker script `kernel.ld`,
+selected case path, and compiler flags. The dependency list includes each file
+the compiler reads. That includes headers beside the case and headers with spaces
+in their names. The Makefile embeds the identity in the test
 kernel and the controller recomputes it from the same inputs, so a stale image
 never passes. The controller rebuilds the test kernel for every boot. A
-dependency scan that fails stops the case with `fail reason=build-identity`, and
-the controller never compares an empty or partial identity.
+failed dependency scan stops the case with `fail reason=build-identity`. The
+controller never compares an empty or partial identity.
 
 The controller checks the structure of the transcript. It cannot prove what the
 kernel computed. A kernel can print a fabricated transcript.
@@ -165,8 +164,8 @@ file and line fields is ordinary output. Two panics, on one line or on separate
 lines, fail with `multiple-panics`. An unrelated panic fails with its own
 reason.
 
-A case that reads console input names a fixture in the manifest, or on the
-controller command line with `--input PATH`. The controller opens a socket
+Some cases read console input. Select a fixture in the manifest or pass
+`--input PATH` on the controller command line. The controller opens a socket
 console and sends the fixture bytes after the begin record. A missing or empty
 fixture sends nothing, so the case meets the deadline.
 
@@ -198,15 +197,14 @@ completion record and the end state.
 
 ## Diagnostics
 
-The controller writes one serial log, one QEMU log, and one build log for each
-boot under `build/logs/`. The files are `<case>.boot1.serial.log`,
-`<case>.boot1.qemu.log`, and `<case>.boot1.build.log`. The controller builds
-before every run. It measures the deadline with a fractional clock when the host
+For each boot, the controller writes one serial log, one QEMU log, and one build
+log under `build/logs/`. Log names follow these patterns: `<case>.boot1.serial.log`,
+`<case>.boot1.qemu.log`, and `<case>.boot1.build.log`. Before every run, the
+controller builds the kernel. It measures the deadline with a fractional clock when the host
 `date` gives fractional seconds, and falls back to whole seconds on another
-host. The log scan and the process scheduler add to the measured time, so the
-deadline bounds a run rather than cutting it at an exact moment. It stops every
-QEMU process it starts and removes its temporary files on every exit path,
-including Ctrl-C.
+host. Log scanning and process scheduling add time. This deadline allows for that work.
+The controller stops every QEMU process it starts. It removes temporary files
+on every exit path, including Ctrl-C.
 
 ## Continuous integration
 

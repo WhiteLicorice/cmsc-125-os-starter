@@ -3,10 +3,10 @@
  * This Stage 2 negative case checks that a load through an unmapped page
  * faults with a known cause.
  *
- * The case starts one kernel-mode process. Its page table maps the kernel but
- * leaves USER_BASE unmapped. A yield selects the process's page table before
- * the load. The unmapped load raises a page fault. The trap handler then panics
- * with the cause and faulting address.
+ * The test starts one kernel-mode process. Its page table maps the kernel and
+ * leaves USER_BASE unmapped. A yield selects that page table before the load.
+ * The load raises a page fault. The trap handler panics with its cause and
+ * faulting address.
  *
  * The manifest declares that PANIC pattern. The case passes only when that
  * pattern appears, alone, after the begin record. A run with no fault, or with

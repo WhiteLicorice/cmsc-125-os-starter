@@ -93,7 +93,7 @@ $(BUILD)/kernel.elf: $(KERNEL_SRCS) kernel.h common.h assert.h kernel.ld $(SHELL
 
 # The user-mode shell. The starter has no shell.c, so this chain never runs
 # there. objcopy runs inside the build directory so the generated symbols keep
-# the names the kernel expects.
+# the symbols the kernel expects.
 $(BUILD)/shell.elf: shell.c user.c common.c user.h common.h user.ld | $(BUILD)
 	$(CC) $(CFLAGS) -I. -Wl,-Tuser.ld -Wl,-Map=$(BUILD)/shell.map \
 	    -o $@ shell.c user.c common.c

@@ -8,7 +8,7 @@
 #
 # The identity covers the compiler dependency list, the linker script
 # kernel.ld, the compiler flags, and the selected case path. The dependency
-# list names every file the compiler reads, including a header beside the
+# list includes every file the compiler reads, including a header beside the
 # selected case and a header whose name holds a space. The Makefile embeds the
 # result in the test kernel. The controller recomputes the identity from the
 # same inputs, so a stale image never passes.

@@ -63,8 +63,8 @@ void ktest_main(void) {
     KTEST_ASSERT(d >= c + PAGE_SIZE);
     KTEST_ASSERT((paddr_t) __free_ram_end - d >= 4 * PAGE_SIZE);
 
-    /* The allocator reserves four pages, then fills them with a pattern. The next
-     * allocation must start after those pages. Every byte must retain its pattern. */
+    /* The allocator reserves four pages. The test fills them with a pattern.
+     * Its successor must start past those pages. Every byte must retain its pattern. */
     fill_block((uint8_t *) d, 4);
 
     paddr_t e = alloc_pages(1);
