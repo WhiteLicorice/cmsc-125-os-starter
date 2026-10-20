@@ -119,7 +119,7 @@ $(BUILD)/ktest/$(CASE).boot$(BOOT).elf: FORCE
 	    -Wl,-Tkernel.ld -Wl,-Map=$(BUILD)/ktest/$(CASE).boot$(BOOT).map -o $@ \
 	    $(KERNEL_SRCS) tests/ktest.c $(SRC)
 
-# The disk image. make run does not recreate an existing image.
+# The disk image. make run rebuilds it when a source file is newer.
 $(BUILD)/disk.tar: $(DISK_SRCS) | $(BUILD)
 	@if [ -z "$(DISK_SRCS)" ]; then echo "error: no disk/*.txt files to pack"; exit 2; fi
 	cd disk && tar cf ../$(BUILD)/disk.tar --format=ustar *.txt

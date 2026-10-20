@@ -481,6 +481,11 @@ fixture_cc_args_check() {
 fixture_cc_args_check
 
 if [ -f "$root/shell.c" ]; then
+    check bad_negative_no_completion "fail reason=no-completion" \
+        --case bad_negative_no_completion \
+        --source tests/selftest/bad_negative_no_completion.c --assertions 1 \
+        --fault "unexpected syscall a3=00000063"
+
     check good_negative "pass reason=ok" \
         --case good_negative --source tests/selftest/good_negative.c \
         --assertions 1 --fault "out of memory"
@@ -514,6 +519,7 @@ if [ -f "$root/shell.c" ]; then
     }
     persistence_reset_check
 else
+    echo "skip    bad_negative_no_completion (needs the stage 3 syscall handler)"
     echo "skip    good_negative      (needs the stage 1 allocator)"
     echo "skip    idle_after_text    (needs the stage 1 idle panic)"
     echo "skip    good_persistence   (needs the stage 4 file system)"

@@ -11,5 +11,6 @@
 void ktest_main(void) {
     ktest_begin("bad_fault_after_failed_assert");
     KTEST_ASSERT(false);
+    ktest_end("bad_fault_after_failed_assert");
     PANIC("declared probe fault");
 }

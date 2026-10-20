@@ -26,3 +26,8 @@ stage3_user_app	3	tests/cases/stage3_user_app.c	4	1	-	-
 stage3_user_illegal	3	tests/cases/stage3_user_illegal.c	0	1	unexpected trap scause=00000002	-
 stage3_user_protection	3	tests/cases/stage3_user_protection.c	0	1	unexpected trap scause=0000000f, stval=80200000	-
 stage4_fs	4	tests/cases/stage4_fs.c	6	1	-	-
+stage4_file_io	4	tests/cases/stage4_file_io.c	3	1	-	-
+stage4_missing_file	4	tests/cases/stage4_missing_file.c	1	1	-	-
+stage4_create_file	4	tests/cases/stage4_create_file.c	6	2	-	-
+stage4_persistence	4	tests/cases/stage4_persistence.c	3	2	-	-
+stage4_unsupported_syscall	4	tests/cases/stage4_unsupported_syscall.c	1	1	unexpected syscall a3=00000063	-

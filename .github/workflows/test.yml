@@ -17,7 +17,7 @@ on:
   pull_request:
 
 env:
-  STAGE: 3
+  STAGE: 4
 
 jobs:
   test:

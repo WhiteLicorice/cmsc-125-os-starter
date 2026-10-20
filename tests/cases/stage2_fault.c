@@ -9,8 +9,8 @@
  * faulting address.
  *
  * The manifest declares that PANIC pattern. The case passes only when that
- * pattern appears, alone, after the begin record. A run with no fault, or with
- * an unrelated panic, fails. The mutant set shows both.
+ * pattern appears after a valid completion record. A run with no fault, or
+ * with an unrelated panic, fails. The mutant set shows both.
  *
  * The starter has no page table, so the build fails on the starter. That
  * failure is the expected start state.
@@ -51,7 +51,6 @@ void ktest_main(void) {
     KTEST_ASSERT(idle_proc->page_table != NULL);
 
     start_kernel_process(fault_reader);
-    yield(); /* Switch to the reader's page table, then fault. */
-
     ktest_end("stage2_fault");
+    yield(); /* Switch to the reader's page table, then fault. */
 }

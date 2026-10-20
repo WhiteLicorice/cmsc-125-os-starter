@@ -14,6 +14,6 @@ static const uint32_t image[] = {0xffffffff};
 void ktest_main(void) {
     ktest_begin("stage3_user_illegal");
     create_process(image, sizeof(image));
-    yield();
     ktest_end("stage3_user_illegal");
+    yield();
 }

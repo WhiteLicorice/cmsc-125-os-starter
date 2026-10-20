@@ -10,4 +10,4 @@
 #include "kernel.h"
 
 #line 10 "C:drive.c"
-void ktest_main(void){ktest_begin("colon_panic");KTEST_ASSERT(1);PANIC("declared probe fault");}
+void ktest_main(void){ktest_begin("colon_panic");KTEST_ASSERT(1);ktest_end("colon_panic");PANIC("declared probe fault");}

@@ -1,5 +1,5 @@
 <!--no-pdf-->
-# CMSC 125 operating system starter
+# CMSC 125 Operating System Starter
 
 This repository is the starting point for the CMSC 125 RV32 operating system.
 A laboratory pair forks it once and adds one laboratory stage at a time. The
@@ -7,8 +7,8 @@ kernel boots, writes to the serial console, and does nothing else. The stages
 add the processes, the memory allocator, the page tables, the system calls, the
 disk, and the file system.
 
-The test badge is red until the selected stage passes. That is the correct
-state for a fresh fork.
+The test badge is red until the selected stage passes. A fresh fork starts in
+this expected red state.
 
 ## Contents
 
@@ -91,7 +91,7 @@ Its SHA-256 is
 `firmware/opensbi-LICENSE` holds the OpenSBI licence. The Makefile passes the
 firmware to QEMU with `-bios`.
 
-## Build and run
+## Build and Run
 
     make
     make run
@@ -112,6 +112,14 @@ controller self-tests.
 `build/test-disk.tar`. Every case copies that file, so a case never writes the
 interactive image that `make run` uses.
 
+The manifest fields are the case name, stage, source file, assertion count,
+boot count, expected fault text, and input fixture. Each case starts with a
+fresh image. A persistence case uses one image for all of its boots. It must
+not rebuild that image between boots. A case that expects a fault must print
+its completion record first. The controller then accepts only the declared
+panic. It rejects an unrelated panic, a missing completion record, and a stale
+build identity.
+
 A test case is one C file under `tests/cases/`. The Makefile links the case
 against the production kernel objects and defines `KTEST`. In test mode
 `kernel_main` calls the case entry point. A case calls production functions
@@ -122,7 +130,7 @@ The starter lacks the mechanisms for stages 1 to 4, so those cases fail. The
 build error identifies the missing symbol. A case passes when you implement its
 stage.
 
-## Record grammar
+## Record Grammar
 
 A test kernel prints the records on the serial console. Each record starts on a
 new line. The controller accepts a record only at the start of a line, so case
@@ -152,12 +160,13 @@ never passes. The controller rebuilds the test kernel for every boot. A
 failed dependency scan stops the case with `fail reason=build-identity`. The
 controller never compares an empty or partial identity.
 
-The controller checks the structure of the transcript. It cannot prove what the
-kernel computed. A kernel can print a fabricated transcript.
+The controller checks the transcript format. Source review is needed to prove
+what the kernel computed. A kernel can print a fabricated transcript.
 
 A negative case declares an expected fault in the manifest as a panic pattern.
-The case passes only when that fault appears after the begin record, alone, and
-the case prints no failed assertion. The controller recognizes a panic wherever
+The case must print a valid completion record before that fault. The case
+passes only when the declared fault appears after the record, alone, and the
+case prints no failed assertion. The controller recognizes a panic wherever
 the complete prefix `PANIC: <file>:<line>: <message>` starts in a line. The
 kernel prints a panic without a leading newline. Bare `PANIC: ` text with no
 file and line fields is ordinary output. Two panics, on one line or on separate
@@ -169,23 +178,22 @@ Some cases read console input. Select a fixture in the manifest or pass
 console and sends the fixture bytes after the begin record. A missing or empty
 fixture sends nothing, so the case meets the deadline.
 
-## End state
+## End State
 
 The test kernel stops in a documented idle loop. The starter has no process, so
 `ktest_idle` prints `KTEST IDLE` and idles.
 
-In a kernel with processes, the last process exits, `yield` returns to the idle
-process, and `kernel_main` panics with `switched to idle process`. The
+In a kernel with processes, the last process exits, `yield` returns to the
+idle process, and `kernel_main` panics with `switched to idle process`. The
 controller accepts that panic only when the whole message equals `switched to
-idle process`, the panic comes after a valid completion record, and it is the
-only panic. A suffix, a prefix, a second panic, or an earlier panic fails the
-case.
+idle process` and it follows a valid completion record. It rejects any second
+panic, suffix, prefix, or earlier panic.
 
 A valid completion record before the twenty-second deadline separates the
 documented end state from a hang. The controller stops QEMU when it reads the
 completion record and the end state.
 
-## Stage map
+## Stage Map
 
 | Stage | Laboratory | Book chapters | Mechanism |
 |:--|:--|:--|:--|
@@ -206,13 +214,13 @@ host. Log scanning and process scheduling add time. This deadline allows for tha
 The controller stops every QEMU process it starts. It removes temporary files
 on every exit path, including Ctrl-C.
 
-## Continuous integration
+## Continuous Integration
 
 `.github/workflows/test.yml` runs one job on Ubuntu 24.04 and one job on macOS,
 with `fail-fast: false`. The Ubuntu job installs the toolchain with apt and runs
 `make test STAGE=$STAGE`. The macOS job installs the toolchain with Homebrew and
 runs `make test-mac STAGE=$STAGE`. Both jobs are red until the selected stage
-passes. That is the correct state for a fresh fork. The workflow builds from the
+passes. A fresh fork should show that red state. The workflow builds from the
 pushed commit.
 
 ## Licence

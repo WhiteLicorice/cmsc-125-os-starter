@@ -12,6 +12,7 @@
 void ktest_main(void) {
     ktest_begin("good_prefixed_fault");
     KTEST_ASSERT(true);
+    ktest_end("good_prefixed_fault");
     printf("ordinary console text ");
     PANIC("declared probe fault");
 }

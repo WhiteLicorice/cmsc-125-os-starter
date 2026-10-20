@@ -10,7 +10,7 @@
 # Reasons: hang, stale-build, malformed-record, duplicate-record,
 #          out-of-order-record, wrong-case, wrong-assertion-count,
 #          assertion-failed, unrelated-panic, multiple-panics,
-#          expected-fault-missing, unexpected-completion, no-completion,
+#          expected-fault-missing, no-completion,
 #          no-idle, ok.
 
 BEGIN {
@@ -108,15 +108,17 @@ END {
     if (nbuild == 0 || nbegin == 0) { print "hang"; exit }
 
     if (fault != "" && fault != "-") {
-        # A negative case. The declared fault must appear, alone, after BEGIN,
-        # and no failed assertion may appear.
-        if (nend > 0) { print "unexpected-completion"; exit }
+        # A negative case. A valid completion record must precede the declared
+        # fault. This proves that the case reached its intended fault point.
         if (np == 0) { print "expected-fault-missing"; exit }
         if (np > 1) { print "multiple-panics"; exit }
         if (pline[1] < beginline) { print "unrelated-panic"; exit }
+        if (nend == 0) { print "no-completion"; exit }
+        if (pline[1] <= endline) { print "out-of-order-record"; exit }
         if (nfail > 0) { print "assertion-failed"; exit }
         if (index(pmsg[1], fault) == 0) { print "unrelated-panic"; exit }
         if (nassert != want) { print "wrong-assertion-count"; exit }
+        if (end_asserts != want || end_failures != 0) { print "wrong-assertion-count"; exit }
         print "ok"; exit
     }
 
