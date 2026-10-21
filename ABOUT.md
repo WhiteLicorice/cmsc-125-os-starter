@@ -109,8 +109,10 @@ missing stage and a stage outside 1 to 4. `make test-harness` runs the
 controller self-tests.
 
 `make test` builds the pristine test image from `disk/` into
-`build/test-disk.tar`. Every case copies that file, so a case never writes the
-interactive image that `make run` uses.
+`build/test-disk.tar` when the repository has a `disk/` folder. Every case
+copies that file, so a case never writes the interactive image that `make run`
+uses. A repository with no `disk/` folder has no file system yet, so the
+controller stops with `error: cannot build the test disk image`.
 
 The manifest fields are the case name, stage, source file, assertion count,
 boot count, expected fault text, and input fixture. Each case starts with a
