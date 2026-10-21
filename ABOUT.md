@@ -181,13 +181,9 @@ fixture sends nothing, so the case meets the deadline.
 ## End State
 
 The test kernel stops in a documented idle loop. The starter has no process, so
-`ktest_idle` prints `KTEST IDLE` and idles.
-
-In a kernel with processes, the last process exits, `yield` returns to the
-idle process, and `kernel_main` panics with `switched to idle process`. The
-controller accepts that panic only when the whole message equals `switched to
-idle process` and it follows a valid completion record. It rejects any second
-panic, suffix, prefix, or earlier panic.
+`ktest_idle` prints `KTEST IDLE` and idles. In a kernel with processes, the last
+process exits, `yield` returns to the idle process, and `kernel_main` panics with
+`switched to idle process`.
 
 A valid completion record before the twenty-second deadline separates the
 documented end state from a hang. The controller stops QEMU when it reads the
