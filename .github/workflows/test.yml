@@ -2,10 +2,16 @@
 #
 # The public test workflow.
 #
-# Set STAGE to the highest stage you have implemented. The workflow runs the
-# same command as the local gate. Each job is red until that stage passes,
-# which is the correct starting state. The Ubuntu job and the macOS job grade
-# the same commit, so both jobs stay red until the stage passes.
+# Fork this repository once, at the start of Lab 1, and keep your fork. Each
+# laboratory raises STAGE by one. Nothing is merged into the fork after the
+# first clone, so the stage you set is the only thing that decides which cases
+# run. Set STAGE to the highest stage you have implemented. The workflow runs
+# the same command as the local gate. Each job is red until that stage passes,
+# which is the correct starting state. A lab at stage N never fails on a case
+# from a stage above N.
+#
+# The Ubuntu job and the macOS job grade the same commit, so both jobs stay red
+# until the stage passes.
 #
 # The macOS job runs the -mac targets. Apple's clang has no 32-bit RISC-V
 # target, so the -mac targets select Homebrew's clang and PATH.
@@ -17,7 +23,8 @@ on:
   pull_request:
 
 env:
-  STAGE: 4
+  # Lab 1. Raise this to 2, 3, and 4 as each laboratory begins.
+  STAGE: 1
 
 jobs:
   test:

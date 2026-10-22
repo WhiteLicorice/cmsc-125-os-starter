@@ -5,7 +5,9 @@
 #
 # Each self-test feeds the controller a deliberately bad case and checks the
 # verdict. The persistence and negative-fault self-tests need the file system
-# and the allocator, so the starter skips them. The starter has no shell.c.
+# and the allocator, so the starter skips them. The starter has no shell.c. The
+# two persistence checks also need a stage 4 file, disk/hello.txt, so a Lab 3
+# tree with shell.c and no disk files skips them too.
 #
 # Run with: make test-harness
 
@@ -89,6 +91,17 @@ restore() {
 trap restore EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
+
+# has_disk_sources is true when disk/ holds at least one .txt file. The stage 4
+# persistence checks read the file that image carries, so they run only when
+# this is true. tests/run-tests.sh applies the same rule to a stage 4 case.
+has_disk_sources() {
+    local f
+    for f in "$root"/disk/*.txt; do
+        if [ -f "$f" ]; then return 0; fi
+    done
+    return 1
+}
 
 # verdict_line prints the verdict from the controller output on stdin.
 verdict_line() {
@@ -494,10 +507,6 @@ if [ -f "$root/shell.c" ]; then
     check idle_after_text "pass reason=ok" \
         --case idle_after_text --source tests/selftest/idle_after_text.c --assertions 1
 
-    check good_persistence "pass reason=ok" \
-        --case good_persistence --source tests/selftest/good_persistence.c \
-        --assertions 2 --boots 2
-
     # Console input through the production path.
     check getchar_probe "pass reason=ok" \
         --case getchar_probe --source tests/selftest/getchar_probe.c \
@@ -507,17 +516,59 @@ if [ -f "$root/shell.c" ]; then
         --case bad_getchar --source tests/selftest/bad_getchar.c \
         --assertions 1 --input tests/selftest/missing.input
 
-    # The disk does not survive the reboot, so the persistence case must fail.
-    persistence_reset_check() {
-        local got wrapper="$harness_tmp/reset-disk-qemu.py"
-        ran=$((ran + 1))
-        cp "$root/tests/selftest/reset-disk-qemu.py" "$wrapper"
-        chmod +x "$wrapper"
-        got="$(verdict_qemu "$wrapper" --case good_persistence \
-            --source tests/selftest/good_persistence.c --assertions 2 --boots 2)"
-        report bad_persistence_reset good_persistence "fail reason=assertion-failed" "$got"
-    }
-    persistence_reset_check
+    # The two persistence checks read disk/hello.txt from the image. They are
+    # a stage 4 requirement. A tree that has shell.c and no disk/*.txt is the
+    # Lab 3 state. It carries no file to persist, so the checks are skipped
+    # there. Skipping beats running them and failing.
+    if has_disk_sources; then
+        check good_persistence "pass reason=ok" \
+            --case good_persistence --source tests/selftest/good_persistence.c \
+            --assertions 2 --boots 2
+
+        # The disk does not survive the reboot, so the persistence case must fail.
+        persistence_reset_check() {
+            local got wrapper="$harness_tmp/reset-disk-qemu.py"
+            ran=$((ran + 1))
+            cp "$root/tests/selftest/reset-disk-qemu.py" "$wrapper"
+            chmod +x "$wrapper"
+            got="$(verdict_qemu "$wrapper" --case good_persistence \
+                --source tests/selftest/good_persistence.c --assertions 2 --boots 2)"
+            report bad_persistence_reset good_persistence "fail reason=assertion-failed" "$got"
+        }
+        persistence_reset_check
+    else
+        echo "skip    good_persistence   (needs the stage 4 file, disk/hello.txt)"
+        echo "skip    bad_persistence_reset (needs the stage 4 file, disk/hello.txt)"
+
+        # The Lab 3 state: shell.c is present and disk/ holds no .txt file.
+        # The selected stage alone decides what runs. A stage 3 case must boot
+        # and pass here, and stage 4 must stop with the clear disk error. Both
+        # paths are cheap: the stage 4 run exits before it boots a case, and
+        # the stage 3 run boots one case. This pins the rule that a stage 4
+        # requirement never fails a stage 3 tree.
+        stage3_disk_check() {
+            local got out rc
+            ran=$((ran + 1))
+            got="$(verdict_of --case stage3_user_app \
+                --source tests/cases/stage3_user_app.c --assertions 4)"
+            report disk_stage3_passes stage3_user_app "pass reason=ok" "$got"
+
+            ran=$((ran + 1))
+            out="$(bash "$ctrl" --stage 4 2>&1)"
+            rc=$?
+            if [ "$rc" -eq 2 ] && \
+                printf '%s\n' "$out" | grep -q 'cannot build the test disk image'; then
+                printf 'self-test %-24s %s\n' disk_stage4_errors \
+                    "exit $rc, missing-disk error printed"
+            else
+                printf 'self-test %-24s FAILED\n' disk_stage4_errors
+                printf '    expected exit 2 with the missing-disk error\n'
+                printf '    got      exit %s: %s\n' "$rc" "$out"
+                failures=$((failures + 1))
+            fi
+        }
+        stage3_disk_check
+    fi
 else
     echo "skip    bad_negative_no_completion (needs the stage 3 syscall handler)"
     echo "skip    good_negative      (needs the stage 1 allocator)"

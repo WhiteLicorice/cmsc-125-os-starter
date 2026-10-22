@@ -2,13 +2,16 @@
 # CMSC 125 Operating System Starter
 
 This repository is the starting point for the CMSC 125 RV32 operating system.
-A laboratory pair forks it once and adds one laboratory stage at a time. The
+A laboratory pair forks it once, at the start of Lab 1, and keeps that fork
+for the term. Nothing is merged into the fork afterwards. Each laboratory
+raises `STAGE` by one. The suite for every stage is already present. The
 kernel boots, writes to the serial console, and does nothing else. The stages
 add the processes, the memory allocator, the page tables, the system calls, the
 disk, and the file system.
 
 The test badge is red until the selected stage passes. A fresh fork starts in
-this expected red state.
+this expected red state. A fork at stage N never fails on a requirement of a
+stage above N.
 
 ## Contents
 
@@ -52,7 +55,8 @@ Run a `-mac` target in a fresh shell with no other setup.
 `make build-mac` builds the kernel. `make run-mac` boots the kernel and prints
 the banner. Stop QEMU with Ctrl-A, then X.
 
-Run the lab commands from your fork. Give the stage as 1 to 4.
+Run the lab commands from your fork. Give the stage as 1 to 4. The stage only
+ever goes up, one laboratory at a time.
 
 The controller uses Python 3 in two places: `tests/serial-client.py`, which
 feeds a case that reads console input, and the persistence-reset self-test in
@@ -111,10 +115,12 @@ controller self-tests.
 `make test` builds the pristine test image from `disk/` into
 `build/test-disk.tar` when the repository has a `shell.c`. Every case
 copies that file, so a case never writes the interactive image that `make run`
-uses. That build needs at least one `disk/*.txt` file. A tree with `shell.c`
-and no `disk/` folder stops with `error: cannot build the test disk image`. A
-tree with neither file skips the build. Each case there reports
-`reason=build-failed`.
+uses. The disk files are a stage 4 requirement. At `STAGE=4` the command needs
+at least one `disk/*.txt` file. A tree with none stops with `error: cannot
+build the test disk image` before any case runs. Below stage 4 the command
+packs an empty image, so a Lab 3 tree, which has `shell.c` and no disk files
+yet, runs its stages 1 to 3 cases and passes them. A tree with no `shell.c`
+skips the image. Each case there reports `reason=build-failed`.
 
 The manifest fields are the case name, stage, source file, assertion count,
 boot count, expected fault text, and input fixture. Each case starts with a
@@ -222,6 +228,10 @@ with `fail-fast: false`. The Ubuntu job installs the toolchain with apt and runs
 runs `make test-mac STAGE=$STAGE`. Both jobs are red until the selected stage
 passes. A fresh fork should show that red state. The workflow builds from the
 pushed commit.
+
+The workflow sets `STAGE: 1`, the Lab 1 stage. Raise it to 2, 3, and 4 as each
+laboratory begins. The selected stage decides which cases run, so a job at
+stage N never fails on a case from a stage above N.
 
 ## Licence
 

@@ -326,7 +326,52 @@ done
 
 mkdir -p "$logs"
 
+# has_disk_sources is true when disk/ holds at least one .txt file.
+has_disk_sources() {
+    local f
+    for f in "$root"/disk/*.txt; do
+        if [ -f "$f" ]; then return 0; fi
+    done
+    return 1
+}
+
+# runs_stage4 is true when this command executes at least one stage 4 case.
+# That is the selected stage 4, or a single case whose manifest row says stage
+# 4. The rule reads the same manifest the case list comes from, so the two
+# paths agree and no stage 4 case ever runs without its disk files.
+runs_stage4() {
+    local name st
+    if [ "${stage:-}" = "4" ]; then return 0; fi
+    if [ -z "${case_name:-}" ]; then return 1; fi
+    while IFS="$(printf '\t')" read -r name st _ _ _ _ _; do
+        [ -n "${name:-}" ] || continue
+        case "$name" in \#*) continue ;; esac
+        if [ "$name" = "$case_name" ]; then
+            [ "${st:-0}" = "4" ] && return 0
+            return 1
+        fi
+    done < "$here/manifest.tsv"
+    return 1
+}
+
+# A kernel that carries shell.c reads the block device at boot, so the drive
+# must be attached and the pristine test image must exist before the first
+# boot. A tree without shell.c has no file system, and no image is built.
+#
+# The disk files are a stage 4 requirement and no earlier stage needs them.
+# Below stage 4 an absent disk/*.txt packs an empty image, so the drive still
+# attaches and the boot works. Only the selected stage decides what runs, so a
+# tree with shell.c and an empty disk/ passes every case at stage 3 or below.
+# A run that reaches a stage 4 case requires the files, and stops with the
+# clear error before it boots any case.
+#
+# The presence of shell.c selects the tree that carries the user-mode shell,
+# exactly as it does in the Makefile.
 if [ -f "$root/shell.c" ]; then
+    if runs_stage4 && ! has_disk_sources; then
+        echo "error: cannot build the test disk image in $root" >&2
+        exit 2
+    fi
     if ! make -C "$root" -s --no-print-directory build/test-disk.tar >/dev/null 2>&1; then
         echo "error: cannot build the test disk image in $root" >&2
         exit 2

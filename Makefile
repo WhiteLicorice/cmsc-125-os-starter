@@ -3,7 +3,9 @@
 # Build, run, and test the CMSC 125 RV32 operating system.
 #
 # The file adapts on its own. It builds the user-mode shell and the disk image
-# only when the tree carries shell.c.
+# only when the tree carries shell.c. The disk files, disk/*.txt, are a stage 4
+# requirement: an empty disk/ packs an empty image, so an earlier stage still
+# boots.
 #
 # Override any tool on the command line, for example:
 #   make CC=/opt/homebrew/opt/llvm/bin/clang QEMU=qemu-system-riscv32
@@ -120,17 +122,31 @@ $(BUILD)/ktest/$(CASE).boot$(BOOT).elf: FORCE
 	    $(KERNEL_SRCS) tests/ktest.c $(SRC)
 
 # The disk image. make run rebuilds it when a source file is newer.
+#
+# The disk files are a stage 4 requirement. An empty disk/ still packs a valid
+# empty archive: the tar end-of-archive block. A kernel that carries shell.c
+# reads the block device at boot, so it must find a drive. Without this rule a
+# Lab 3 tree, which has shell.c and no disk files yet, could not boot. The
+# controller requires disk/*.txt at stage 4, and it reports the missing files
+# there. This recipe therefore never treats an empty disk/ as an error.
 $(BUILD)/disk.tar: $(DISK_SRCS) | $(BUILD)
-	@if [ -z "$(DISK_SRCS)" ]; then echo "error: no disk/*.txt files to pack"; exit 2; fi
-	cd disk && tar cf ../$(BUILD)/disk.tar --format=ustar *.txt
+	@if [ -z "$(DISK_SRCS)" ]; then \
+	    tar cf $@ --format=ustar -T /dev/null; \
+	else \
+	    cd disk && tar cf ../$(BUILD)/disk.tar --format=ustar *.txt; \
+	fi
 
 disk: $(BUILD)/disk.tar
 
 # The pristine test image. The controller copies it for each case, so a case
-# never writes this file. make run never writes it either.
+# never writes this file. make run never writes it either. It follows the same
+# rule as the interactive image: an empty disk/ packs an empty archive.
 $(BUILD)/test-disk.tar: $(DISK_SRCS) | $(BUILD)
-	@if [ -z "$(DISK_SRCS)" ]; then echo "error: no disk/*.txt files to pack"; exit 2; fi
-	cd disk && tar cf ../$(BUILD)/test-disk.tar --format=ustar *.txt
+	@if [ -z "$(DISK_SRCS)" ]; then \
+	    tar cf $@ --format=ustar -T /dev/null; \
+	else \
+	    cd disk && tar cf ../$(BUILD)/test-disk.tar --format=ustar *.txt; \
+	fi
 
 test-disk: $(BUILD)/test-disk.tar
 
