@@ -129,11 +129,20 @@ $(BUILD)/ktest/$(CASE).boot$(BOOT).elf: FORCE
 # Lab 3 tree, which has shell.c and no disk files yet, could not boot. The
 # controller requires disk/*.txt at stage 4, and it reports the missing files
 # there. This recipe therefore never treats an empty disk/ as an error.
+#
+# The blocking factor of 20 records makes the image 10,240 bytes on every host.
+# GNU tar, which Linux provides, uses that factor by default. BSD tar, which
+# macOS provides as /usr/bin/tar, writes only the records the files need, so a
+# one-file image comes out at 2,048 bytes. The kernel then sees four 512-byte
+# sectors and refuses every write past sector 3, so a second file's data never
+# reaches the disk and stage 4 fails on macOS alone.
+TAR_BLOCKING := -b 20
+
 $(BUILD)/disk.tar: $(DISK_SRCS) | $(BUILD)
 	@if [ -z "$(DISK_SRCS)" ]; then \
-	    tar cf $@ --format=ustar -T /dev/null; \
+	    tar cf $@ --format=ustar $(TAR_BLOCKING) -T /dev/null; \
 	else \
-	    cd disk && tar cf ../$(BUILD)/disk.tar --format=ustar *.txt; \
+	    cd disk && tar cf ../$(BUILD)/disk.tar --format=ustar $(TAR_BLOCKING) *.txt; \
 	fi
 
 disk: $(BUILD)/disk.tar
@@ -143,9 +152,9 @@ disk: $(BUILD)/disk.tar
 # rule as the interactive image: an empty disk/ packs an empty archive.
 $(BUILD)/test-disk.tar: $(DISK_SRCS) | $(BUILD)
 	@if [ -z "$(DISK_SRCS)" ]; then \
-	    tar cf $@ --format=ustar -T /dev/null; \
+	    tar cf $@ --format=ustar $(TAR_BLOCKING) -T /dev/null; \
 	else \
-	    cd disk && tar cf ../$(BUILD)/test-disk.tar --format=ustar *.txt; \
+	    cd disk && tar cf ../$(BUILD)/test-disk.tar --format=ustar $(TAR_BLOCKING) *.txt; \
 	fi
 
 test-disk: $(BUILD)/test-disk.tar
