@@ -24,16 +24,16 @@ void yield(void);
 extern struct process *current_proc;
 extern struct process *idle_proc;
 
-/* All ones. The word is illegal because of the target's instruction-length
- * rule, not because of a register width. The specification encodes instruction
- * length in the low-order bits. With bits 1 and 0 both 1, the instruction is at
- * least 32 bits. With bits 6 to 0 all 1, the encoding is reserved for an
- * instruction of 192 bits or more. The supported target has ILEN 32, the
- * longest instruction a base-only hart decodes, so the hart raises an
- * illegal-instruction exception rather than fetch this word. `ld` is illegal on
- * this target too, because it is an RV64I load and the target is RV32, but its
- * encoding is 32 bits. The assembler refuses `ld` under `--target=riscv32`, so
- * the case emits the raw word instead. */
+/* All ones. An encoding of all ones that spans ILEN bits is illegal, and the
+ * specification gives that encoding the length ILEN. A base-only RV32
+ * implementation has ILEN 32, and this target decodes no instruction longer
+ * than 32 bits. A 32-bit word of all ones fills every one of those bits, so the
+ * specification makes the word an illegal instruction of 32 bits. The rule
+ * turns on instruction length, not on register width, and the hart raises an
+ * illegal-instruction exception rather than fetch the word. `ld` is illegal
+ * here too, because it is an RV64I load and the target is RV32, but its
+ * encoding is 32 bits, so its length is not the reason. The assembler refuses
+ * `ld` under `--target=riscv32`, so the case emits the raw word instead. */
 #define ILLEGAL_WORD ".word 0xffffffff"
 
 /* Run as the started process. The trap ends the boot before it can return. */
