@@ -75,18 +75,20 @@ The validated versions are these.
 | qemu-system-riscv32 | 8.2.2 |
 | GNU Make | 4.3 |
 
-The macOS runner reports these versions.
+The macOS runner reported these versions on the last gate run, 2026-10-23. The
+version each formula resolves to changes as Homebrew ships new bottles, so a
+later run may report a later patch release.
 
 | Tool | Version |
 |:--|:--|
 | macOS | 26.6.2, build 25G83, arm64 |
 | clang on `PATH` | Apple clang 21.0.0, no 32-bit RISC-V target |
-| clang via `CC` | Homebrew clang 23.1.0 |
-| lld | Homebrew LLD 23.1.0 |
-| qemu-system-riscv32 | 11.1.1 |
+| clang via `CC` | Homebrew clang 23.1.3 |
+| lld | Homebrew LLD 23.1.3 |
+| qemu-system-riscv32 | 11.1.2 |
 | GNU Make | 3.81 |
 | bash | 3.2.57 |
-| Python | 3.14.7 |
+| Python | 3.15.0 |
 
 Ubuntu 24.04 ships no 32-bit RISC-V OpenSBI image, so the firmware is
 vendored. `firmware/opensbi-riscv32-generic-fw_dynamic.bin` is 123072 bytes.
