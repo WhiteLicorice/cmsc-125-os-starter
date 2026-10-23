@@ -15,6 +15,7 @@ stage1_process	1	tests/cases/stage1_process.c	8	1	-	-
 stage1_switch	1	tests/cases/stage1_switch.c	8	1	-	-
 stage1_regs	1	tests/cases/stage1_regs.c	26	1	-	-
 stage1_stack	1	tests/cases/stage1_stack.c	5	1	-	-
+stage1_trap	1	tests/cases/stage1_trap.c	1	1	unexpected trap scause=00000002	-
 stage2_alloc	2	tests/cases/stage2_alloc.c	8	1	-	-
 stage2_align	2	tests/cases/stage2_align.c	11	1	-	-
 stage2_uninit	2	tests/cases/stage2_uninit.c	8	1	-	-
