@@ -2,9 +2,9 @@
  *
  * Stage 4 seed case: disk and files.
  *
- * The full suite is added later. This seed checks the file table that fs_init
- * loads from the disk image, and one round trip through the block device.
- * The controller gives the case a fresh copy of the pristine image.
+ * This seed checks the file table that fs_init loads from the disk image, and
+ * one round trip through the block device. The controller gives the case a
+ * fresh copy of the pristine image; all four stages' cases ship in the fork.
  */
 #include "assert.h"
 #include "kernel.h"

@@ -69,8 +69,8 @@ KERNEL_SRCS := kernel.c common.c
 BASE_ID      = $(shell sh tests/build-id.sh '' '$(CFLAGS)' '$(CC)' 2>/dev/null)
 KERNEL_DEFS = -DKTEST_BUILD_ID=\"$(BASE_ID)\"
 
-# A tree that carries shell.c has the user-mode shell and the file system. The
-# test is the file's presence, so a Lab 3 shell turns these steps on.
+# When shell.c exists, the build links the user-mode shell into the kernel and
+# attaches a disk to QEMU. The test is the file's presence, not its contents.
 HAS_USER := $(if $(wildcard shell.c),1,)
 
 DISK_SRCS := $(wildcard disk/*.txt)

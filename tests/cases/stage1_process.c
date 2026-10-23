@@ -5,8 +5,8 @@
  * The case calls the production mechanisms of stage 1 and reports the result
  * through the record grammar. It needs the page allocator and the process
  * mechanism: an idle process, `alloc_pages`, and `yield`. Until those exist
- * the build fails, which is the expected start state. The full suite is added
- * later.
+ * the build fails, which is the expected start state. Every case for all four
+ * stages ships in the fork from the start, so none arrives later.
  */
 #include "assert.h"
 #include "kernel.h"

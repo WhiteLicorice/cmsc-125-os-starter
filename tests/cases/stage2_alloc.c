@@ -2,8 +2,8 @@
  *
  * Stage 2 seed case: page allocation and page tables.
  *
- * The full suite comes later. This seed checks allocation alignment, zero fill,
- * and the two-level page table built by map_page.
+ * This seed checks alignment, zero fill, and the two-level page table built by
+ * map_page. All four stages' cases ship in the fork, so none arrives later.
  */
 #include "assert.h"
 #include "kernel.h"
