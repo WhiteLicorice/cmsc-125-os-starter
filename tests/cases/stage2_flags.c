@@ -11,8 +11,9 @@
  * A kernel that writes the leaf with `|=` keeps the old write bit and the old
  * frame, and fails the replacement check.
  *
- * The starter has no page table, so the build fails on the starter. That
- * failure is the expected start state.
+ * The case builds once the kernel has `map_page` and the page allocator that
+ * supplies its tables. Until then the build fails, which is the expected start
+ * state.
  */
 #include "assert.h"
 #include "kernel.h"

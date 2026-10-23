@@ -4,7 +4,7 @@
  *
  * The case declares one fault but prints two panic records. A second panic is
  * a contradiction, so the controller must report "multiple-panics". The case
- * does not return.
+ * does not return, so the kernel cannot add its own idle panic.
  */
 #include "assert.h"
 

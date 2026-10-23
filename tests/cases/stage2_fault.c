@@ -12,8 +12,9 @@
  * pattern appears after a valid completion record. A run with no fault, or
  * with an unrelated panic, fails. The mutant set shows both.
  *
- * The starter has no page table, so the build fails on the starter. That
- * failure is the expected start state.
+ * The case builds once the kernel has page tables and a page fault that ends
+ * the boot: `create_process`, a page table, the trap entry and handler, and
+ * `yield`. Until then the build fails, which is the expected start state.
  */
 #include "assert.h"
 #include "kernel.h"

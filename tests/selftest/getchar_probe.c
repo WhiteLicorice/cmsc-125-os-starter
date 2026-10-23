@@ -3,8 +3,9 @@
  * Self-test fixture: console input through the production path.
  *
  * The controller sends the fixture tests/selftest/getchar_probe.input. The
- * case reads one byte through SYS_GETCHAR and checks it. It needs the stage 3
- * syscall mechanism.
+ * case reads one byte through SYS_GETCHAR and checks it. It builds once the
+ * kernel has the stage 3 system-call mechanism, `handle_syscall`, so the gate
+ * runs it only in a tree with shell.c.
  */
 #include "assert.h"
 #include "kernel.h"

@@ -12,8 +12,9 @@
  * The check stops before it runs the processes, because two processes on one
  * stack corrupt each other's saved context frames and the kernel then faults.
  *
- * The starter has no process mechanism, so the build fails on the starter. That
- * failure is the expected start state.
+ * The case builds once the kernel has a process mechanism: `create_process`,
+ * `switch_context`, and `yield`. Until then the build fails, which is the
+ * expected start state.
  */
 #include "assert.h"
 #include "kernel.h"

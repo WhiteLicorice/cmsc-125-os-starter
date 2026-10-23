@@ -8,8 +8,9 @@
  * level-1 entry. The third uses a different level-1 entry. A map_page that installs the
  * wrong physical page, the wrong leaf index, or the wrong level fails here.
  *
- * The starter has no page table, so the build fails on the starter. That
- * failure is the expected start state.
+ * The case builds once the kernel has `map_page` and the page allocator that
+ * supplies its tables. Until then the build fails, which is the expected start
+ * state.
  */
 #include "assert.h"
 #include "kernel.h"

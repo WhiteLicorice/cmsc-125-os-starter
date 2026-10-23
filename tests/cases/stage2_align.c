@@ -9,8 +9,8 @@
  * preserves the block's bytes. Misalignment, overlap, or a short reserved
  * extent fails the test.
  *
- * The starter has no allocator, so the build fails on the starter. That
- * failure is the expected start state.
+ * The case builds once the kernel has the page allocator, `alloc_pages`.
+ * Until then the build fails, which is the expected start state.
  */
 #include "assert.h"
 #include "kernel.h"

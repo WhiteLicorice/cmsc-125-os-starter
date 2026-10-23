@@ -4,10 +4,9 @@
 # The controller self-tests.
 #
 # Each self-test feeds the controller a deliberately bad case and checks the
-# verdict. The persistence and negative-fault self-tests need the file system
-# and the allocator, so the starter skips them. The starter has no shell.c. The
-# two persistence checks also need a stage 4 file, disk/hello.txt, so a Lab 3
-# tree with shell.c and no disk files skips them too.
+# verdict. The syscall, allocator, and idle checks run only when the tree holds
+# shell.c. The two persistence checks also need a stage 4 file, disk/hello.txt,
+# so a tree with shell.c and no disk files skips them too.
 #
 # Run with: make test-harness
 

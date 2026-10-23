@@ -4,7 +4,9 @@
  *
  * The controller supplies no input because the fixture does not exist. The
  * case waits for a byte that never comes, so the boot ends at the deadline
- * with no completion record. It needs the stage 3 syscall mechanism.
+ * with no completion record. It builds once the kernel has the stage 3
+ * system-call mechanism, `handle_syscall`, so the gate runs it only in a tree
+ * with shell.c.
  */
 #include "assert.h"
 #include "kernel.h"

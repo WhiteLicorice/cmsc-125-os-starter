@@ -6,8 +6,9 @@
  * runs them in a fixed order, so the case asserts the order of their steps.
  * A yield that picks the wrong next process changes the order.
  *
- * The starter has no process mechanism, so the build fails on the starter. That
- * failure is the expected start state.
+ * The case builds once the kernel has a process mechanism: `create_process`,
+ * `switch_context`, and `yield`. Until then the build fails, which is the
+ * expected start state.
  */
 #include "assert.h"
 #include "kernel.h"
