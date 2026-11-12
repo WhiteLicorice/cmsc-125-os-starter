@@ -38,7 +38,7 @@ The gate runs on Ubuntu 24.04. On Windows, install WSL2 with Ubuntu 24.04 and
 run every command in WSL.
 
     sudo apt update
-    sudo apt install -y clang llvm lld qemu-system-misc
+    sudo apt install -y clang llvm lld qemu-system-misc python3
 
 On macOS, install Homebrew and the LLVM and QEMU formulae.
 
@@ -207,7 +207,7 @@ completion record and the end state.
 
 | Stage | Laboratory | Book chapters | Mechanism |
 |:--|:--|:--|:--|
-| starter | Lab 0 | 4 to 7 | Boot, SBI console, libc, panic |
+| starter | Provided starter | 4 to 7 | Boot, SBI console, libc, panic |
 | 1 | Lab 1 | 8 to 10 | Exceptions, page allocation, processes |
 | 2 | Lab 2 | 11 | Page tables |
 | 3 | Lab 3 | 12 to 14 | Applications, user mode, system calls |
