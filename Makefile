@@ -121,7 +121,7 @@ $(BUILD)/ktest/$(CASE).boot$(BOOT).elf: FORCE
 	    { echo "error: $(CASE) has no build identity: the dependency scan failed" >&2; exit 1; }; \
 	$(CC) $(CFLAGS) -I. -DKTEST -DKTEST_BOOT=$(BOOT) -DKTEST_BUILD_ID=\"$$id\" \
 	    -Wl,-Tkernel.ld -Wl,-Map=$(BUILD)/ktest/$(CASE).boot$(BOOT).map -o $@ \
-	    $(KERNEL_SRCS) tests/ktest.c $(SRC)
+	    $(KERNEL_SRCS) tests/ktest.c $(SRC) $(SHELL_OBJ)
 
 # The disk image. make run rebuilds it when a source file is newer.
 #
