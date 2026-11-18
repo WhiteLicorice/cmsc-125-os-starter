@@ -41,7 +41,9 @@ SECTIONS {
 }
 
 /* Boot allocations and the stage 1 zeroing case share this region. The case
- * writes four pages past the first page it reads, and the smallest region
- * that carries all four stages is 64 KiB. */
-ASSERT(__free_ram_end - __free_ram >= 16 * 4096,
-       "free region too small: __free_ram_end - __free_ram must be at least 65536 bytes (16 pages); enlarge the reservation after __free_ram in kernel.ld")
+ * writes four pages past the first page it reads, so the four stage suites
+ * need 64 KiB. Booting the shell needs more. The smallest measured region that
+ * both passes every stage and reaches the shell prompt is 108 KiB, so the floor
+ * is 112 KiB, the next multiple of 16 KiB. */
+ASSERT(__free_ram_end - __free_ram >= 28 * 4096,
+       "free region too small: __free_ram_end - __free_ram must be at least 114688 bytes (28 pages); enlarge the reservation after __free_ram in kernel.ld")
