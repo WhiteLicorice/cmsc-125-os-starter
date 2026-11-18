@@ -40,9 +40,8 @@ SECTIONS {
     __free_ram_end = .;
 }
 
-/* The largest request in the suite is four pages. The stage 1 zeroing case
- * writes four pages past the first page it reads before it asks for a
- * three-page block, so a smaller region takes the write outside itself and
- * the allocator reports only "out of memory". */
-ASSERT(__free_ram_end - __free_ram >= 8 * 4096,
-       "free region too small: __free_ram_end - __free_ram must be at least 32768 bytes (8 pages); enlarge the reservation after __free_ram in kernel.ld")
+/* Boot allocations and the stage 1 zeroing case share this region. The case
+ * writes four pages past the first page it reads, and the smallest region
+ * that carries all four stages is 64 KiB. */
+ASSERT(__free_ram_end - __free_ram >= 16 * 4096,
+       "free region too small: __free_ram_end - __free_ram must be at least 65536 bytes (16 pages); enlarge the reservation after __free_ram in kernel.ld")
