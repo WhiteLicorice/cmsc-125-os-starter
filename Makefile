@@ -115,7 +115,7 @@ $(BUILD)/shell.bin.o: $(BUILD)/shell.bin
 # never be served from a stale object. The identity covers the compiler
 # dependency list, the case path, and the flags, so a stale image also fails the
 # identity check.
-$(BUILD)/ktest/$(CASE).boot$(BOOT).elf: FORCE
+$(BUILD)/ktest/$(CASE).boot$(BOOT).elf: $(SHELL_OBJ) FORCE
 	@mkdir -p $(BUILD)/ktest
 	@id=$$(sh tests/build-id.sh '$(SRC)' '$(CFLAGS) -DKTEST -DKTEST_BOOT=$(BOOT)' '$(CC)') || \
 	    { echo "error: $(CASE) has no build identity: the dependency scan failed" >&2; exit 1; }; \

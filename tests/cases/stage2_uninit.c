@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Stage 2 case: every allocated page reads as zero, even a recycled one.
+ * Stage 1 case: every page reads as zero, even one dirtied before allocation.
  *
  * The case reads a fresh page first. Then it dirties the next page the allocator
  * will return, requests that page, and reads it back. It dirties each page in a
@@ -45,7 +45,7 @@ void ktest_main(void) {
     paddr_t q = alloc_pages(1);
     KTEST_ASSERT(q == p + PAGE_SIZE);
 
-    /* The allocator returns the recycled page with every byte set to zero. */
+    /* The page it dirtied before allocation comes back with every byte zero. */
     KTEST_ASSERT(page_is_zero((const uint8_t *) q));
 
     /* Dirty every page the three-page block will occupy, so a zero fill that
