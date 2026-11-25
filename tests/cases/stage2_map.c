@@ -1,13 +1,17 @@
 /* SPDX-License-Identifier: MIT
  *
- * This Stage 2 case checks that map_page builds an Sv32 mapping that translates correctly.
+ * This Stage 2 case checks where map_page places three mappings and the PPN
+ * each one decodes to.
  *
  * The case builds one level-1 table, maps three virtual addresses to three
  * physical pages, and decodes the PPN from this lab's two-level table: from the
  * level-1 entry to the level-0 table, then to the leaf entry. Two addresses
  * share a level-1 entry. The third uses a different level-1 entry. A map_page
  * that installs the wrong physical page, the wrong leaf index, or the wrong
- * level fails here.
+ * level fails here. The decoder follows the level-1 entry as a pointer and
+ * reads the leaf PPN, so it skips the entry-type and permission checks a real
+ * walk applies. tests/cases/stage2_flags.c checks the flag bits and the
+ * level-1 entry.
  *
  * The case builds once the kernel has `map_page` and the page allocator that
  * supplies its tables. Until then the build fails, which is the expected start

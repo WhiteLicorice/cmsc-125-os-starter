@@ -3,8 +3,9 @@
  * Self-test fixture: an intended negative fault from a wrapped byte size.
  *
  * The case records completion before its declared fault. The count is large
- * enough that its byte size passes 2^32, so the allocator must stop at the page
- * count before it multiplies.
+ * enough that its byte size reaches 2^32 and wraps to zero in 32-bit unsigned
+ * arithmetic, so the allocator must stop at the page count before it
+ * multiplies.
  */
 #include "assert.h"
 #include "kernel.h"
