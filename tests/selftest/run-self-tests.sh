@@ -171,6 +171,19 @@ echo "deadline ${KTEST_DEADLINE}s"
 check bad_hang "fail reason=hang" \
     --case bad_hang --source tests/selftest/bad_hang.c --assertions 0
 
+# A QEMU that fails to start leaves an empty serial log and one line on its
+# own standard error. That is not a hang, and the controller must say so.
+launch_failed_check() {
+    local got wrapper="$harness_tmp/launch-fail-qemu.sh"
+    ran=$((ran + 1))
+    cp "$root/tests/selftest/launch-fail-qemu.sh" "$wrapper"
+    chmod +x "$wrapper"
+    got="$(verdict_qemu "$wrapper" --case bad_hang \
+        --source tests/selftest/bad_hang.c --assertions 0)"
+    report launch_failed bad_hang "fail reason=launch-failed" "$got"
+}
+launch_failed_check
+
 check bad_no_completion "fail reason=no-completion" \
     --case bad_no_completion --source tests/selftest/bad_no_completion.c --assertions 1
 

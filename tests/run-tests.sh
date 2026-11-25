@@ -117,6 +117,7 @@ run_boot() {
     local name=$1 boot=$2 image=$3 input=$4
     local slog="$logs/$name.boot$boot.serial.log"
     local qlog="$logs/$name.boot$boot.qemu.log"
+    local errlog="$logs/$name.boot$boot.qemu.err.log"
     local pid="" client="" sock="" p rest size last_size start t_now last_change
 
     : > "$slog"
@@ -141,7 +142,10 @@ run_boot() {
         args+=( -serial "file:$slog" )
     fi
 
-    "$QEMU" "${args[@]}" >/dev/null 2>&1 &
+    # QEMU's own message goes to a file of its own. A launch failure leaves no
+    # serial output, so this file is the only evidence of the reason.
+    : > "$errlog"
+    "$QEMU" "${args[@]}" >/dev/null 2> "$errlog" &
     pid=$!
     qemu_pids="$qemu_pids $pid"
 
@@ -256,6 +260,14 @@ run_case() {
 
         run_boot "$name" "$b" "$image" "$input"
         r="$(classify "$logs/$name.boot$b.serial.log" "$name" "$want" "$fault" "$want_id")"
+        # A QEMU that never started writes no build record and explains itself
+        # on standard error. That is a launch failure, not a guest that ran out
+        # of time, and the reason says which one happened.
+        if [ "$r" != "ok" ] && [ -s "$logs/$name.boot$b.qemu.err.log" ] &&
+            ! grep -q 'KTEST BUILD' "$logs/$name.boot$b.serial.log" 2>/dev/null; then
+            r="launch-failed"
+            echo "case $name: boot $b qemu: $(head -n 1 "$logs/$name.boot$b.qemu.err.log")"
+        fi
         if [ "$r" != "ok" ]; then
             result="fail"
             reason="$r"
