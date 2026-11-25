@@ -18,7 +18,7 @@ stage above N.
 | Path | Purpose |
 |:--|:--|
 | `kernel.c` | The entry point, the SBI call, and the console writer |
-| `common.c` | The small libc. Memory and string operations and `printf` |
+| `common.c` | The small libc. The memory and string routines the compiler may call, and `printf` |
 | `user.h` | The application declarations: the console calls, the two semaphore calls, and `exit` |
 | `user.c` | The application entry, the system-call stub, and the call wrappers |
 | `assert.h` | The assertion macro and the build identity |
