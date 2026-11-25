@@ -15,9 +15,11 @@ int syscall(int sysno, int arg0, int arg1, int arg2) {
     register int a2 __asm__("a2") = arg2;
     register int a3 __asm__("a3") = sysno;
 
+    /* a0 is a read-write operand: the argument goes in, and the result comes
+     * back in the same register. */
     __asm__ __volatile__("ecall"
-                         : "=r"(a0)
-                         : "r"(a0), "r"(a1), "r"(a2), "r"(a3)
+                         : "+r"(a0)
+                         : "r"(a1), "r"(a2), "r"(a3)
                          : "memory");
 
     return a0;

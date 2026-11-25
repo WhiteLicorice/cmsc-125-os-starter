@@ -3,10 +3,11 @@
  * This Stage 2 case checks that map_page builds an Sv32 mapping that translates correctly.
  *
  * The case builds one level-1 table, maps three virtual addresses to three
- * physical pages, and walks the table the way the MMU does: from the level-1
- * entry to the level-0 table, then to the leaf entry. Two addresses share a
- * level-1 entry. The third uses a different level-1 entry. A map_page that installs the
- * wrong physical page, the wrong leaf index, or the wrong level fails here.
+ * physical pages, and decodes the PPN from this lab's two-level table: from the
+ * level-1 entry to the level-0 table, then to the leaf entry. Two addresses
+ * share a level-1 entry. The third uses a different level-1 entry. A map_page
+ * that installs the wrong physical page, the wrong leaf index, or the wrong
+ * level fails here.
  *
  * The case builds once the kernel has `map_page` and the page allocator that
  * supplies its tables. Until then the build fails, which is the expected start
@@ -19,9 +20,10 @@
 paddr_t alloc_pages(uint32_t n);
 void map_page(uint32_t *table1, uint32_t vaddr, paddr_t paddr, uint32_t flags);
 
-/* Walk the two Sv32 levels, as the MMU does, and return the physical page the
- * leaf entry encodes. An absent level-1 entry, or an absent leaf, means the
- * address does not translate. */
+/* Read the two Sv32 levels and return the physical page the leaf entry
+ * encodes. This decodes the PPN from the table; it skips the page offset and
+ * the permission checks a real walk applies. An absent level-1 entry, or an
+ * absent leaf, means the address does not translate. */
 static paddr_t sv32_translate(uint32_t *table1, uint32_t vaddr) {
     uint32_t vpn1 = (vaddr >> 22) & 0x3ff;
     uint32_t pte1 = table1[vpn1];
@@ -64,8 +66,8 @@ void ktest_main(void) {
     KTEST_ASSERT(sv32_translate(table1, va1) != sv32_translate(table1, va2));
     KTEST_ASSERT(sv32_translate(table1, va1) != sv32_translate(table1, va3));
 
-    /* Addresses va1 and va2 share a level-1 entry. Address va3 uses a different
- * level-1 entry. */
+    /* Addresses va1 and va2 share a level-1 entry. Address va3 uses a
+     * different level-1 entry. */
     uint32_t vpn1_1 = (va1 >> 22) & 0x3ff;
     uint32_t vpn1_2 = (va2 >> 22) & 0x3ff;
     uint32_t vpn1_3 = (va3 >> 22) & 0x3ff;

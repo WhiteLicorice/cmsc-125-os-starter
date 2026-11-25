@@ -76,7 +76,8 @@ void ktest_main(void) {
     KTEST_ASSERT(PTE_PPN(*leaf3) == pc / PAGE_SIZE);
 
     /* Mapping the same page again replaces the old leaf. A kernel that ORs the
-     * new entry into the old one keeps the old write bit and the old frame. */
+     * new entry into the old one keeps the old write bit, and the PPN it writes
+     * is the OR of the old and new fields, which names no page at all. */
     paddr_t pd = alloc_pages(1);
     uint32_t va4 = 0x80800000;
     map_page(table1, va4, pc, PAGE_R | PAGE_W);

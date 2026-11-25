@@ -10,7 +10,7 @@
  *
  * The manifest declares that PANIC pattern. The case passes only when that
  * pattern appears after a valid completion record. A run with no fault, or
- * with an unrelated panic, fails. The mutant set shows both.
+ * with an unrelated panic, fails.
  *
  * The case builds once the kernel has page tables and a page fault that ends
  * the boot: `create_process`, a page table, the trap entry and handler, and
