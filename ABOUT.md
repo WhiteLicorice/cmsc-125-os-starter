@@ -180,7 +180,12 @@ what the kernel computed. A kernel can print a fabricated transcript.
 A negative case declares an expected fault in the manifest as a panic pattern.
 The case must print a valid completion record before that fault. The case
 passes only when the declared fault appears after the record, alone, and the
-case prints no failed assertion. The controller recognizes a panic wherever
+case prints no failed assertion. A positive case needs both: no failed
+assertion, and a clean completion. The completion record alone is not enough.
+The end record must carry the right counts, and the run must reach its accepted
+end state. A positive case that stops after the record fails with
+`reason=no-idle`, and a negative case with no panic fails with
+`reason=expected-fault-missing`. The controller recognizes a panic wherever
 the complete prefix `PANIC: <file>:<line>: <message>` starts in a line. The
 kernel prints a panic without a leading newline. Bare `PANIC: ` text with no
 file and line fields is ordinary output. Two panics, on one line or on separate
@@ -201,7 +206,8 @@ process exits, `yield` returns to the idle process, and `kernel_main` panics wit
 
 A valid completion record before the twenty-second deadline separates the
 documented end state from a hang. The controller stops QEMU when it reads the
-completion record and the end state.
+completion record and the end state. A record without that end state is an
+incomplete case, not a pass.
 
 ## Stage Map
 
@@ -215,9 +221,14 @@ completion record and the end state.
 
 ## Diagnostics
 
-For each boot, the controller writes one serial log, one QEMU log, and one build
-log under `build/logs/`. Log names follow these patterns: `<case>.boot1.serial.log`,
-`<case>.boot1.qemu.log`, and `<case>.boot1.build.log`. Before every run, the
+For each boot, the controller writes one serial log, one QEMU log, one QEMU
+error log, and one build log under `build/logs/`. Log names follow these
+patterns: `<case>.boot1.serial.log`, `<case>.boot1.qemu.log`,
+`<case>.boot1.qemu.err.log`, and `<case>.boot1.build.log`. The error log holds
+what QEMU itself printed. When the guest never starts, the serial log stays
+empty and that message is the whole diagnosis, so the controller reports
+`reason=launch-failed` and prints the first line of the error log beside the
+case. Before every run, the
 controller builds the kernel. It measures the deadline with a fractional clock when the host
 `date` gives fractional seconds, and falls back to whole seconds on another
 host. Log scanning and process scheduling add time. This deadline allows for that work.
@@ -229,7 +240,8 @@ on every exit path, including Ctrl-C.
 `.github/workflows/test.yml` runs one job on Ubuntu 24.04 and one job on macOS,
 with `fail-fast: false`. The Ubuntu job installs the toolchain with apt and runs
 `make test STAGE=$STAGE`. The macOS job installs the toolchain with Homebrew and
-runs `make test-mac STAGE=$STAGE`. Both jobs are red until the selected stage
+runs `make test-mac STAGE=$STAGE`. Each job runs the same selected stage through
+the entry point of its own host. Both jobs are red until the selected stage
 passes. A fresh fork should show that red state. The workflow builds from the
 pushed commit.
 

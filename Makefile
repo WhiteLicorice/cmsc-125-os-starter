@@ -54,6 +54,9 @@ MAC_PATH     = $(MAC_LLVM_BIN):$(BREW_PREFIX)/bin:$(PATH)
 # vendored and named explicitly.
 BIOS     := firmware/opensbi-riscv32-generic-fw_dynamic.bin
 
+# -ffreestanding drops the hosted assumptions. It does not stop the compiler
+# from emitting a call to memcpy or memset for a loop, so common.c provides
+# those routines and the link needs no hosted library.
 CFLAGS   ?= -std=c11 -O2 -g3 -Wall -Wextra \
             --target=riscv32-unknown-elf -fuse-ld=lld \
             -fno-stack-protector -ffreestanding -nostdlib
