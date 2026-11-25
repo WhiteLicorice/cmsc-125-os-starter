@@ -225,13 +225,20 @@ For each boot, the controller writes one serial log, one QEMU log, one QEMU
 error log, and one build log under `build/logs/`. Log names follow these
 patterns: `<case>.boot1.serial.log`, `<case>.boot1.qemu.log`,
 `<case>.boot1.qemu.err.log`, and `<case>.boot1.build.log`. The error log holds
-what QEMU itself printed. When the guest never starts, the serial log stays
-empty and that message is the whole diagnosis, so the controller reports
-`reason=launch-failed` and prints the first line of the error log beside the
-case. Before every run, the
-controller builds the kernel. It measures the deadline with a fractional clock when the host
-`date` gives fractional seconds, and falls back to whole seconds on another
-host. Log scanning and process scheduling add time. This deadline allows for that work.
+what QEMU itself printed. The controller reports `reason=launch-failed` when
+all three of these conditions hold:
+
+- QEMU exited on its own.
+- Its status was nonzero.
+- The serial log was empty.
+
+The controller then prints the first line of the error log, when the log is
+not empty.
+
+Before every run, the controller builds the kernel. It measures the deadline
+with a fractional clock when the host `date` gives fractional seconds, and
+falls back to whole seconds on another host. Log scanning and process
+scheduling add time. This deadline allows for that work.
 The controller stops every QEMU process it starts. It removes temporary files
 on every exit path, including Ctrl-C.
 
