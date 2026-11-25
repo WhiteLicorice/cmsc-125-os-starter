@@ -23,8 +23,10 @@ base_cc="${CC:-clang}"
 # The fixture compilers delegate their real compile to this compiler.
 export KTEST_BASE_CC="$base_cc"
 
-# A short deadline keeps the deliberate hangs quick.
-export KTEST_DEADLINE="${KTEST_DEADLINE:-5}"
+# Match the controller's own twenty-second deadline. A shorter bound reports a
+# healthy guest as a hang when QEMU starts slowly, and the product would accept
+# that boot. A real hang still stops at this bound with the same verdict.
+export KTEST_DEADLINE="${KTEST_DEADLINE:-20}"
 export KTEST_POLL="${KTEST_POLL:-0.1}"
 
 # The noisy QEMU stand-in delegates to the real emulator. It carries the
