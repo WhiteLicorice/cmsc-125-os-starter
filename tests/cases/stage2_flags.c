@@ -8,8 +8,10 @@
  * the requested R, W, X, and U bits plus V. A level-1 entry holds V alone.
  *
  * The case then maps one page again with reduced permissions and a new frame.
- * A kernel that writes the leaf with `|=` keeps the old write bit and the old
- * frame, and fails the replacement check.
+ * A kernel that ORs the new entry into the old one keeps the old write bit,
+ * and the PPN it writes combines both PPN fields. The page the entry then
+ * names need not be the one either mapping asked for, so the replacement
+ * check fails.
  *
  * The case builds once the kernel has `map_page` and the page allocator that
  * supplies its tables. Until then the build fails, which is the expected start
