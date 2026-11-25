@@ -77,7 +77,8 @@ void ktest_main(void) {
 
     /* Mapping the same page again replaces the old leaf. A kernel that ORs the
      * new entry into the old one keeps the old write bit, and the PPN it writes
-     * is the OR of the old and new fields, which names no page at all. */
+     * combines both PPN fields. The page the entry then names need not be the
+     * one either mapping asked for. */
     paddr_t pd = alloc_pages(1);
     uint32_t va4 = 0x80800000;
     map_page(table1, va4, pc, PAGE_R | PAGE_W);
