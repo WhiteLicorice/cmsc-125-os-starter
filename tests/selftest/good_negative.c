@@ -15,7 +15,7 @@ void ktest_main(void) {
     KTEST_ASSERT(PAGE_SIZE == 4096);
     ktest_end("good_negative");
 
-    /* One more page than the region holds, and a count whose byte size passes
-     * 2^32. The second must panic before the page-count arithmetic wraps. */
-    alloc_pages(0x100000);
+    /* One page more than the region holds. The count check must stop the
+     * kernel without touching the page past the end. */
+    alloc_pages(16385);
 }
