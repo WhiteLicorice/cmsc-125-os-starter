@@ -27,6 +27,10 @@ export KTEST_BASE_CC="$base_cc"
 export KTEST_DEADLINE="${KTEST_DEADLINE:-5}"
 export KTEST_POLL="${KTEST_POLL:-0.1}"
 
+# The noisy QEMU stand-in delegates to the real emulator. It carries the
+# caller's QEMU value, as the compiler fixtures carry CC.
+export KTEST_BASE_QEMU="${QEMU:-qemu-system-riscv32}"
+
 # The controller removes build/tmp on every exit path. Keep these backups
 # outside build/.
 harness_tmp="$(mktemp -d)"
@@ -183,6 +187,54 @@ launch_failed_check() {
     report launch_failed bad_hang "fail reason=launch-failed" "$got"
 }
 launch_failed_check
+
+# A QEMU that leaves with status 0 did not fail to start, so the reason is
+# the guest's own.
+exit_zero_check() {
+    local got wrapper="$harness_tmp/exit-zero-qemu.sh"
+    ran=$((ran + 1))
+    cp "$root/tests/selftest/exit-zero-qemu.sh" "$wrapper"
+    chmod +x "$wrapper"
+    got="$(verdict_qemu "$wrapper" --case bad_hang \
+        --source tests/selftest/bad_hang.c --assertions 0)"
+    report exit_zero bad_hang "fail reason=hang" "$got"
+}
+exit_zero_check
+
+# A QEMU that warns and then runs says nothing about the guest. The run's own
+# verdict must stand.
+noisy_qemu_check() {
+    local got wrapper="$harness_tmp/noisy-qemu.sh"
+    ran=$((ran + 1))
+    cp "$root/tests/selftest/noisy-qemu.sh" "$wrapper"
+    chmod +x "$wrapper"
+    got="$(verdict_qemu "$wrapper" --case bad_hang \
+        --source tests/selftest/bad_hang.c --assertions 0)"
+    report noisy_qemu bad_hang "fail reason=hang" "$got"
+}
+noisy_qemu_check
+
+# A kernel that stops before it prints the build record leaves the same empty
+# transcript as a QEMU that never started. The controller stops this one
+# itself, so the reason is a hang, and not a launch failure.
+pre_build_hang_check() {
+    local got
+    ran=$((ran + 1))
+    cp "$kernel_src" "$kernel_bak"
+    kernel_mutated=1
+    awk '{ if (!done && $0 ~ /ktest_build\(\);/) {
+               print "    for (;;) __asm__ __volatile__(\"wfi\");";
+               done = 1
+           }
+           print }' "$kernel_bak" > "$harness_tmp/kernel.c.hang"
+    cp "$harness_tmp/kernel.c.hang" "$kernel_src"
+    got="$(verdict_of --case bad_hang --source tests/selftest/bad_hang.c \
+        --assertions 0)"
+    cp "$kernel_bak" "$kernel_src"
+    kernel_mutated=0
+    report no_build_hang bad_hang "fail reason=hang" "$got"
+}
+pre_build_hang_check
 
 check bad_no_completion "fail reason=no-completion" \
     --case bad_no_completion --source tests/selftest/bad_no_completion.c --assertions 1
@@ -515,6 +567,12 @@ if [ -f "$root/shell.c" ]; then
         --case good_negative --source tests/selftest/good_negative.c \
         --assertions 1 --fault "out of memory"
 
+    # The same panic from the other cause: a count whose byte size wraps.
+    check good_wrap_negative "pass reason=ok" \
+        --case good_wrap_negative \
+        --source tests/selftest/good_wrap_negative.c \
+        --assertions 1 --fault "out of memory"
+
     # The idle panic follows console text on the same line.
     check idle_after_text "pass reason=ok" \
         --case idle_after_text --source tests/selftest/idle_after_text.c --assertions 1
@@ -584,6 +642,7 @@ if [ -f "$root/shell.c" ]; then
 else
     echo "skip    bad_negative_no_completion (needs the stage 3 syscall handler)"
     echo "skip    good_negative      (needs the stage 1 allocator)"
+    echo "skip    good_wrap_negative (needs the stage 1 allocator)"
     echo "skip    idle_after_text    (needs the stage 1 idle panic)"
     echo "skip    good_persistence   (needs the stage 4 file system)"
     echo "skip    getchar_probe      (needs the stage 3 syscall)"

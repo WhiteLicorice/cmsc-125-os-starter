@@ -70,6 +70,10 @@ total=0
 failed=0
 qemu_pids=""
 client_pids=""
+# Set by run_boot for the boot just finished: whether QEMU stopped on its own,
+# and the status it exited with.
+boot_self_exited=0
+boot_status=0
 
 usage() {
     echo "usage: tests/run-tests.sh --stage N [--no-build]" >&2
@@ -119,6 +123,7 @@ run_boot() {
     local qlog="$logs/$name.boot$boot.qemu.log"
     local errlog="$logs/$name.boot$boot.qemu.err.log"
     local pid="" client="" sock="" p rest size last_size start t_now last_change
+    local self_exited=0
 
     : > "$slog"
 
@@ -161,12 +166,18 @@ run_boot() {
         client_pids="$client_pids $client"
     fi
 
-    # Wait for a terminal record, a settled panic, or the deadline.
+    # Wait for a terminal record, a settled panic, the deadline, or QEMU
+    # stopping by itself. The last case is recorded, because only QEMU decides
+    # it: a launch failure is QEMU leaving before the guest runs, and a QEMU
+    # that the controller stops also writes a termination line.
     start="$(now_s)"
     last_change="$start"
     last_size=-1
     while :; do
-        kill -0 "$pid" 2>/dev/null || break
+        if ! kill -0 "$pid" 2>/dev/null; then
+            self_exited=1
+            break
+        fi
         t_now="$(now_s)"
         if elapsed "$t_now" "$start" "$DEADLINE"; then break; fi
         if grep -q '^KTEST IDLE' "$slog" 2>/dev/null; then break; fi
@@ -183,7 +194,9 @@ run_boot() {
     done
 
     kill "$pid" 2>/dev/null || true
-    wait "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null
+    boot_status=$?
+    boot_self_exited=$self_exited
     rest=""
     for p in $qemu_pids; do
         [ "$p" = "$pid" ] || rest="$rest $p"
@@ -260,11 +273,13 @@ run_case() {
 
         run_boot "$name" "$b" "$image" "$input"
         r="$(classify "$logs/$name.boot$b.serial.log" "$name" "$want" "$fault" "$want_id")"
-        # A QEMU that never started writes no build record and explains itself
-        # on standard error. That is a launch failure, not a guest that ran out
-        # of time, and the reason says which one happened.
-        if [ "$r" != "ok" ] && [ -s "$logs/$name.boot$b.qemu.err.log" ] &&
-            ! grep -q 'KTEST BUILD' "$logs/$name.boot$b.serial.log" 2>/dev/null; then
+        # A launch failure is a QEMU that left on its own, with a nonzero
+        # status, before the guest wrote a byte. The text on standard error
+        # never decides: a QEMU the controller stops writes a termination line
+        # there too, and a QEMU that warns and then runs writes one as well.
+        if [ "$r" != "ok" ] && [ "$boot_self_exited" -eq 1 ] &&
+            [ "$boot_status" -ne 0 ] &&
+            [ ! -s "$logs/$name.boot$b.serial.log" ]; then
             r="launch-failed"
             echo "case $name: boot $b qemu: $(head -n 1 "$logs/$name.boot$b.qemu.err.log")"
         fi
