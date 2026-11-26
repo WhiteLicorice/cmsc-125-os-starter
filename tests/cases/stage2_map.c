@@ -8,9 +8,13 @@
  * level-1 entry to the level-0 table, then to the leaf entry. Two addresses
  * share a level-1 entry. The third uses a different level-1 entry. A map_page
  * that installs the wrong physical page, the wrong leaf index, or the wrong
- * level fails here. The decoder follows the level-1 entry as a pointer and
- * reads the leaf PPN, so it skips the entry-type and permission checks a real
- * walk applies. tests/cases/stage2_flags.c checks the flag bits and the
+ * level fails here. The decoder follows the level-1 entry as a pointer. The
+ * case requires a level-1 pointer and rejects any R, W, or X bit there. The
+ * hardware also refuses to treat such an entry as a pointer. W with R clear is
+ * a reserved encoding, so the walk faults. Any other entry with R or X set is
+ * a level-1 leaf. A 4 KiB mapping placed at level 1 is at the wrong level, so
+ * it fails the case. The decoder still skips the leaf permission checks and
+ * the page offset. tests/cases/stage2_flags.c checks the flag bits and the
  * level-1 entry.
  *
  * The case builds once the kernel has `map_page` and the page allocator that
@@ -26,12 +30,20 @@ void map_page(uint32_t *table1, uint32_t vaddr, paddr_t paddr, uint32_t flags);
 
 /* Read the two Sv32 levels and return the physical page the leaf entry
  * encodes. This decodes the PPN from the table; it skips the page offset and
- * the permission checks a real walk applies. An absent level-1 entry, or an
- * absent leaf, means the address does not translate. */
+ * the permission checks a real walk applies. An absent level-1 entry, a root
+ * entry that is not a pointer, or an absent leaf means the address does not
+ * translate. */
 static paddr_t sv32_translate(uint32_t *table1, uint32_t vaddr) {
     uint32_t vpn1 = (vaddr >> 22) & 0x3ff;
     uint32_t pte1 = table1[vpn1];
     if ((pte1 & PAGE_V) == 0)
+        return (paddr_t) -1;
+
+    /* The case requires a level-1 pointer, so it rejects any R, W, or X bit
+     * here. W with R clear is a reserved encoding and any other entry with R
+     * or X set is a level-1 leaf, so a 4 KiB mapping placed at level 1 does
+     * not translate. */
+    if (pte1 & (PAGE_R | PAGE_W | PAGE_X))
         return (paddr_t) -1;
 
     uint32_t *table0 = (uint32_t *) ((pte1 >> 10) * PAGE_SIZE);
@@ -79,6 +91,13 @@ void ktest_main(void) {
     KTEST_ASSERT(vpn1_1 != vpn1_3);
     KTEST_ASSERT(table1[vpn1_1] == table1[vpn1_2]);
     KTEST_ASSERT(table1[vpn1_1] != table1[vpn1_3]);
+
+    /* A root entry with R set is a level-1 leaf, so the 4 KiB mapping under
+     * it sits at the wrong level and does not translate. */
+    uint32_t pte1_3 = table1[vpn1_3];
+    table1[vpn1_3] |= PAGE_R;
+    KTEST_ASSERT(sv32_translate(table1, va3) == (paddr_t) -1);
+    table1[vpn1_3] = pte1_3;
 
     /* The two addresses in one region reach distinct leaves. */
     uint32_t *table0 = (uint32_t *) ((table1[vpn1_1] >> 10) * PAGE_SIZE);
