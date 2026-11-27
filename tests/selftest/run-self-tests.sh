@@ -97,15 +97,23 @@ trap restore EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-# has_disk_sources is true when disk/ holds at least one .txt file. The stage 4
-# persistence checks read the file that image carries, so they run only when
-# this is true. tests/run-tests.sh applies the same rule to a stage 4 case.
+# has_disk_sources is true when disk/ holds at least one .txt file. The
+# controller builds the test image from those files, and a stage 4 case needs
+# one.
 has_disk_sources() {
     local f
     for f in "$root"/disk/*.txt; do
         if [ -f "$f" ]; then return 0; fi
     done
     return 1
+}
+
+# has_persistence_seed is true when disk/hello.txt exists. The stage 4
+# persistence checks read that file and its fixed contents, so another .txt
+# file is not a seed. Without it the checks are skipped, and the skip line
+# names the file.
+has_persistence_seed() {
+    [ -f "$root/disk/hello.txt" ]
 }
 
 # verdict_line prints the verdict from the controller output on stdin.
@@ -589,10 +597,12 @@ if [ -f "$root/shell.c" ]; then
         --assertions 1 --input tests/selftest/missing.input
 
     # The two persistence checks read disk/hello.txt from the image. They are
-    # a stage 4 requirement. A tree that has shell.c and no disk/*.txt is the
-    # Lab 3 state. It carries no file to persist, so the checks are skipped
-    # there. Skipping beats running them and failing.
-    if has_disk_sources; then
+    # a stage 4 requirement. A tree that has shell.c and no disk/hello.txt is
+    # the Lab 3 state. It carries no file to persist, so the checks are skipped
+    # there. Skipping beats running them and failing. A tree with another
+    # disk/*.txt has a disk but not this seed, so the persistence checks skip
+    # and the Lab 3 disk checks stay off.
+    if has_persistence_seed; then
         check good_persistence "pass reason=ok" \
             --case good_persistence --source tests/selftest/good_persistence.c \
             --assertions 2 --boots 2
@@ -608,6 +618,9 @@ if [ -f "$root/shell.c" ]; then
             report bad_persistence_reset good_persistence "fail reason=assertion-failed" "$got"
         }
         persistence_reset_check
+    elif has_disk_sources; then
+        echo "skip    good_persistence   (needs the stage 4 file, disk/hello.txt)"
+        echo "skip    bad_persistence_reset (needs the stage 4 file, disk/hello.txt)"
     else
         echo "skip    good_persistence   (needs the stage 4 file, disk/hello.txt)"
         echo "skip    bad_persistence_reset (needs the stage 4 file, disk/hello.txt)"
