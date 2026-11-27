@@ -9,9 +9,9 @@ kernel boots, writes to the serial console, and does nothing else. The stages
 add the processes, the memory allocator, the page tables, the system calls, the
 disk, and the file system.
 
-The test badge is red until the selected stage passes. A fresh fork starts in
-this expected red state. A fork at stage N never fails on a requirement of a
-stage above N.
+The workflow result in your fork's Actions tab is red until the selected stage
+passes. A fresh fork starts in this expected red state. A fork at stage N never
+fails on a requirement of a stage above N.
 
 ## Contents
 
@@ -124,7 +124,9 @@ at least one `disk/*.txt` file. A tree with none stops with `error: cannot
 build the test disk image` before any case runs. Below stage 4 the command
 packs an empty image, so a Lab 3 tree, which has `shell.c` and no disk files
 yet, runs its stages 1 to 3 cases and passes them. A tree with no `shell.c`
-skips the image. Each case there reports `reason=build-failed`.
+skips the image. The test target still runs the controller. Every case on a
+fresh starter reports `reason=build-failed`, since the kernel lacks the
+mechanism the case calls.
 
 The manifest fields are the case name, stage, source file, assertion count,
 boot count, expected fault text, and input fixture. Each case starts with a

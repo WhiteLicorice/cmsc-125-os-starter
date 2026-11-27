@@ -10,5 +10,5 @@ template into this file, and fill it in as your operating system grows.
 `ABOUT.md` documents this starter, its commands, and its tests. Read it before
 you begin.
 
-The test badge stays red until the selected stage passes. This is correct for a
-fresh fork.
+The workflow result in your fork's Actions tab is red until the selected stage
+passes. This is correct for a fresh fork.
