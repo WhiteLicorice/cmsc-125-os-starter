@@ -58,6 +58,15 @@ elapsed() {
         'BEGIN { exit !(now - start >= limit) }'
 }
 
+# valid_boots N is true for a positive integer. A count of zero or a
+# non-number runs no boot, so the case would report a pass it never earned.
+valid_boots() {
+    case "$1" in
+        ''|*[!0-9]*) return 1 ;;
+    esac
+    [ "$1" -gt 0 ]
+}
+
 stage=""
 case_name=""
 case_src=""
@@ -353,6 +362,11 @@ done
 
 mkdir -p "$logs"
 
+if ! valid_boots "$case_boots"; then
+    echo "error: --boots needs a positive integer (got '$case_boots')" >&2
+    exit 2
+fi
+
 # has_disk_sources is true when disk/ holds at least one .txt file.
 has_disk_sources() {
     local f
@@ -418,6 +432,10 @@ if [ -n "$stage" ]; then
         [ -n "${name:-}" ] || continue
         case "$name" in \#*) continue ;; esac
         if [ "$st" -le "$stage" ]; then
+            if ! valid_boots "${boots:-1}"; then
+                echo "error: the boots field for $name needs a positive integer (got '${boots:-}')" >&2
+                exit 2
+            fi
             run_case "$name" "$src" "$want" "${boots:-1}" "${fault:--}" "${input:--}"
         fi
     done < "$here/manifest.tsv"
