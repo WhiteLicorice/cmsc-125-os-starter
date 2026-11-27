@@ -2,7 +2,7 @@
 # CMSC 125 Operating System Starter
 
 This repository is the starting point for the CMSC 125 RV32 operating system.
-A laboratory pair forks it once, at the start of Lab 1, and keeps that fork
+A laboratory group forks it once, at the start of Lab 1, and keeps that fork
 for the term. Nothing is merged into the fork afterwards. Each laboratory
 raises `STAGE` by one. The suite for every stage is already present. The
 kernel boots, writes to the serial console, and does nothing else. The stages
