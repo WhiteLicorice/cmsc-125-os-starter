@@ -13,7 +13,7 @@ firmware/*.bin binary
 # language. The test tooling below is not C, so hide it from that count and
 # leave the C kernel, the C cases, and the C self-test fixtures detectable.
 #
-# The three shell test scripts.
+# The shell scripts.
 *.sh linguist-detectable=false
 # The two compiler wrappers carry a shell shebang but no extension.
 /tests/selftest/no-deps-clang linguist-detectable=false
