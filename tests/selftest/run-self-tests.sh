@@ -655,14 +655,14 @@ if [ -f "$root/shell.c" ]; then
         stage3_disk_check
     fi
 else
-    echo "skip    bad_negative_no_completion (needs the stage 3 syscall handler)"
-    echo "skip    good_negative      (needs the stage 1 allocator)"
-    echo "skip    good_wrap_negative (needs the stage 1 allocator)"
-    echo "skip    idle_after_text    (needs the stage 1 idle panic)"
-    echo "skip    good_persistence   (needs the stage 4 file system)"
-    echo "skip    getchar_probe      (needs the stage 3 syscall)"
-    echo "skip    bad_getchar        (needs the stage 3 syscall)"
-    echo "skip    bad_persistence_reset (needs the stage 4 file system)"
+    echo "skip    bad_negative_no_completion (runs once shell.c exists, Lab 3)"
+    echo "skip    good_negative      (runs once shell.c exists, Lab 3)"
+    echo "skip    good_wrap_negative (runs once shell.c exists, Lab 3)"
+    echo "skip    idle_after_text    (runs once shell.c exists, Lab 3)"
+    echo "skip    good_persistence   (runs once shell.c exists, Lab 3)"
+    echo "skip    getchar_probe      (runs once shell.c exists, Lab 3)"
+    echo "skip    bad_getchar        (runs once shell.c exists, Lab 3)"
+    echo "skip    bad_persistence_reset (runs once shell.c exists, Lab 3)"
 fi
 
 echo
