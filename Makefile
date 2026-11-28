@@ -154,8 +154,10 @@ disk: $(BUILD)/disk.tar
 
 # The pristine test image. The controller copies it for each case, so a case
 # never writes this file. make run never writes it either. It follows the same
-# rule as the interactive image: an empty disk/ packs an empty archive.
-$(BUILD)/test-disk.tar: $(DISK_SRCS) | $(BUILD)
+# rule as the interactive image: an empty disk/ packs an empty archive. FORCE
+# rebuilds it on every suite run, so a file deleted from disk/ leaves the
+# archive the next time and no stale entry survives.
+$(BUILD)/test-disk.tar: $(DISK_SRCS) FORCE | $(BUILD)
 	@if [ -z "$(DISK_SRCS)" ]; then \
 	    tar cf $@ --format=ustar $(TAR_BLOCKING) -T /dev/null; \
 	else \
