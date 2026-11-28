@@ -659,10 +659,10 @@ else
     echo "skip    good_negative      (runs once shell.c exists, Lab 3)"
     echo "skip    good_wrap_negative (runs once shell.c exists, Lab 3)"
     echo "skip    idle_after_text    (runs once shell.c exists, Lab 3)"
-    echo "skip    good_persistence   (runs once shell.c exists, Lab 3)"
+    echo "skip    good_persistence   (runs once shell.c exists and disk/hello.txt is present, Lab 4)"
     echo "skip    getchar_probe      (runs once shell.c exists, Lab 3)"
     echo "skip    bad_getchar        (runs once shell.c exists, Lab 3)"
-    echo "skip    bad_persistence_reset (runs once shell.c exists, Lab 3)"
+    echo "skip    bad_persistence_reset (runs once shell.c exists and disk/hello.txt is present, Lab 4)"
 fi
 
 echo
