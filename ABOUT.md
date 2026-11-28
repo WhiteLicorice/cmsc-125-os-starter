@@ -63,8 +63,9 @@ ever goes up, one laboratory at a time.
 The controller uses Python 3 in two places: `tests/serial-client.py`, which
 feeds a case that reads console input, and the persistence-reset self-test in
 `make test-harness`. Install Python 3 before `make test-harness` or a case with
-an input fixture. Ubuntu ships it. On macOS it comes with the Xcode Command
-Line Tools, and Homebrew installs those tools with its first formula.
+an input fixture. Ubuntu ships it. On macOS, the Homebrew installer installs
+the Xcode Command Line Tools, which carry `python3`. Confirm it with
+`python3 --version`.
 
 The validated versions are these.
 
