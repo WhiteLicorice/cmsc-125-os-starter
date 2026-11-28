@@ -24,7 +24,8 @@ def main() -> int:
                 if field.startswith("file="):
                     shutil.copyfile(pristine, field[len("file="):])
                     break
-    os.execvp("qemu-system-riscv32", ["qemu-system-riscv32"] + args)
+    qemu = os.environ.get("KTEST_BASE_QEMU", "qemu-system-riscv32")
+    os.execvp(qemu, [qemu] + args)
     return 0
 
 
