@@ -70,7 +70,7 @@ The validated versions are these.
 
 | Tool | Version |
 |:--|:--|
-| Ubuntu | 24.04.3 LTS |
+| Ubuntu | 24.04.5 LTS |
 | clang | 18.1.3 |
 | lld | 18.1.3 |
 | llvm-objcopy | 18.1.3 |
